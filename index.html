@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>峽谷對決 1.1.15</title>
+<title>峽谷對決 1.2.1</title>
 <style>
 :root{--bg:#dfe8e3;--ink:#13222b;--panel:rgba(255,255,255,.85);--line:rgba(19,34,43,.28);--acc:#d9a526;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1a22;--ink:#e8f1f2;--panel:rgba(10,20,28,.82);--line:rgba(232,241,242,.28);color-scheme:dark}}
@@ -12,12 +12,14 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 body.two{--b:42px}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .p{position:fixed;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;line-height:1.5}
-#shopb{left:calc(8px + env(safe-area-inset-left,0px));top:calc(90px + env(safe-area-inset-top,0px));color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+#shopb{left:calc(6px + env(safe-area-inset-left,0px));top:calc(88px + env(safe-area-inset-top,0px));color:#fff;font:inherit;font-size:11px;cursor:pointer;background:rgba(9,24,34,.72);border-color:rgba(255,255,255,.28);border-radius:10px;padding:4px 9px;backdrop-filter:blur(8px)}
 #shop,#shop2{top:calc(60px + env(safe-area-inset-top,0px));display:none;grid-template-columns:1fr;gap:4px;max-height:calc(100% - 150px);overflow:auto;overscroll-behavior:contain;touch-action:pan-y;background:var(--panel);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px;padding:6px;z-index:8}
 #shop button,#shop2 button{display:block;width:100%;margin:0;padding:3px 6px;text-align:left;font:inherit;font-size:13px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;cursor:pointer}
 #shop button:disabled,#shop2 button:disabled{opacity:.4;cursor:default}
 #shopb2{left:calc(50% + 8px);top:calc(90px + env(safe-area-inset-top,0px));color:var(--ink);font:inherit;font-size:13px;cursor:pointer;display:none}
-#opp0,#opp1{top:calc(124px + env(safe-area-inset-top,0px));width:210px;font-size:12px;line-height:1.5;display:none}
+#opp0,#opp1{top:calc(124px + env(safe-area-inset-top,0px));width:186px;font-size:12px;line-height:1.5;display:none;background:rgba(9,24,34,.62);color:#e8f1f2;border-color:rgba(255,255,255,.22);backdrop-filter:blur(6px);padding:5px 10px;cursor:pointer;opacity:.94}#opp0.open,#opp1.open{opacity:1}
+#opp0 .o2,#opp1 .o2{display:none}
+#opp0.open .o2,#opp1.open .o2{display:block}#opp0::after,#opp1::after{content:none}
 .g{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(4,var(--b));gap:5px}
 .g button{width:var(--b);height:var(--b);border-radius:50%;border:2px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:10px;line-height:1.1;cursor:pointer;position:relative;overflow:hidden;padding:0;touch-action:none}
 .g button.ult{border-color:var(--acc)}
@@ -26,7 +28,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:
 .g b{display:block;font-size:14px}
 .g i{position:absolute;left:0;right:0;bottom:0;height:0;background:rgba(0,0,0,.45)}
 #ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,16,22,.62);padding:12px;z-index:5}
-#ov .c{touch-action:pan-y;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:16px 20px;width:min(640px,100%);max-height:92%;overflow:auto;text-align:center}
+#ov .c{touch-action:pan-y;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:16px 20px;width:min(640px,100%);max-height:94%;box-sizing:border-box;overflow:auto;text-align:center}
 #ov h1{margin:0 0 6px;font-size:26px}
 #ov p{margin:5px 0;font-size:13px;line-height:1.6;text-align:left}
 #ov .pick button{margin:3px;padding:5px 9px;font:inherit;font-size:13px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
@@ -40,7 +42,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:
 #ov #ob2{position:static;flex:none}
 #picks{display:flex;gap:10px}#picks>div{flex:1 1 0;min-width:0}
 @media (max-width:560px){#picks{flex-direction:column}}
-@media (max-height:480px){#ov{padding:4px}#ov .c{padding:8px 14px}#ov h1{font-size:20px;margin:0}#ov p{margin:2px 0}#ob{display:none}}
+@media (max-height:520px){#ov{padding:4px}#ov .c{padding:8px 14px}#ov h1{font-size:22px;margin:0}#ob{display:none}#ov p{margin:2px 0}#ov summary{font-size:12px;margin:2px 0}#profileLine{margin:0;font-size:12px}.homeBrand{margin:2px 0 4px;font-size:9px}.homeBrand:before,.homeBrand:after{width:18px}#ov .homeFeatures{margin:2px 0 6px;gap:4px}#ov .homeFeatures span{padding:2px 7px;font-size:10px}#modes{margin:4px 0 6px;padding:6px}#modes label{margin:0 6px;font-size:12px}#ov .pick button{margin:2px;padding:3px 6px;font-size:12px}#ov #ob2{min-height:44px;font-size:15px;margin-top:6px}#picks{gap:4px}#profileBtn,#friendsBtn,#rankBtn,#matchBtn,#friendDuelBtn,#homeSettingsBtn{font-size:11px;padding:3px 7px;border-radius:8px}#ov .pick{display:flex;flex-wrap:wrap;gap:2px}#ov .pick button{font-size:11px;padding:2px 5px;min-width:56px}#ov h1{font-size:18px}}
 /* 1.1.13：直向模式提示改為頂部提示條，不再覆蓋主頁與選角介面 */
 #rot{position:fixed;left:50%;top:calc(8px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:20;display:none;align-items:center;justify-content:center;max-width:calc(100% - 32px);box-sizing:border-box;border:1px solid rgba(255,255,255,.28);border-radius:999px;background:rgba(9,24,34,.82);color:#fff;font-size:13px;line-height:1.4;text-align:center;padding:8px 14px;pointer-events:none;backdrop-filter:blur(8px)}
 @media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
@@ -83,7 +85,7 @@ canvas{background:linear-gradient(135deg,#203e36,#122b30 55%,#1a2635)}
 #ov .pick button:focus-visible,#ov #ob2:focus-visible{outline:3px solid #254f58;outline-offset:2px}
 @media(max-width:560px){#ov{padding:9px}#ov .c{border-radius:17px;padding:12px}#picks{gap:4px}#ov .pick button{min-width:66px;margin:2px;padding:7px 8px;font-size:12px}}
 @media(prefers-reduced-motion:no-preference){#ov .c{animation:homeIn .28s ease-out}@keyframes homeIn{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}}
-</style>
+@media (max-height:520px){#ov h1{font-size:17px;letter-spacing:.06em;margin:0}#ov .homeFeatures{margin:2px 0 4px}#modes{margin:2px 0 4px;padding:4px}#ov .pick button{font-size:10px;padding:1px 3px;min-width:0;margin:1px;white-space:nowrap}#hd0,#hd1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-size:11px}#ov .pick{gap:1px}#ov #ob2{min-height:40px;font-size:14px;margin-top:4px}#picks{gap:2px}}.g{--b:44px;gap:5px;bottom:calc(68px + env(safe-area-inset-bottom,0px))}.g button{font-size:8px;white-space:nowrap;line-height:1.05}.g button b{font-size:11px}</style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0f2f22">
 <meta name="mobile-web-app-capable" content="yes">
@@ -249,35 +251,35 @@ function deco(e){const n=e.cls.n,c=Math.cos(e.face),s=Math.sin(e.face),r=e.r,x=e
  ctx.fillStyle='#fff';ctx.textAlign='center'}
 // s 順序：0一技能 1二技能 2大招 3瞄準發射 4技能五 5技能六
 const HEROES=[
-{n:'安琪拉',r:'法師',hp:480,atk:30,spd:3.2,rng:230,mp:300,s:[
+{n:'安琪拉',r:'法師',hp:480,atk:30,spd:2.3,rng:230,mp:300,s:[
  SK('火球',40,240,h=>{aim(h,450);line(h,450,26,90+h.atk*.8)}),
  SK('燃燒',60,420,h=>{const p=tgt(h,420);aoe(h,p.x,p.y,140,100+h.atk)}),
  SK('烈焰焚身',120,1500,h=>{h.ch=120}),
  SK('火球術',50,300,h=>shot(h,9,600,16,110+h.atk)),
  SK('灼熱護盾',50,480,h=>{heal(h,1,.1);aoe(h,h.x,h.y,120,50+h.atk*.5)}),
  SK('瞬燃',40,600,h=>{h.face+=Math.PI;dash(h,200)})]},
-{n:'孫悟空',r:'打野',hp:620,atk:28,spd:3.7,rng:110,mp:240,s:[
+{n:'孫悟空',r:'打野',hp:620,atk:28,spd:2.6,rng:110,mp:240,s:[
  SK('分身突襲',40,240,h=>{aim(h,300);dash(h,220);aoe(h,h.x,h.y,100,80+h.atk)}),
  SK('橫掃',40,360,h=>aoe(h,h.x,h.y,170,70+h.atk)),
  SK('七十二變',100,1500,h=>{aim(h,300);dash(h,200);aoe(h,h.x,h.y,280,150+h.atk*1.4);h.hp=Math.min(h.max,h.hp+h.max*.2)}),
  SK('金箍棒',50,300,h=>shot(h,10,380,22,100+h.atk,1)),
  SK('觔斗雲',30,500,h=>dash(h,380)),
  SK('毫毛分身',60,600,h=>{aoe(h,h.x,h.y,140,60+h.atk*.6);heal(h,1,.08)})]},
-{n:'李信',r:'對抗',nomp:true,hp:760,atk:26,spd:3.3,rng:120,mp:240,s:[
+{n:'李信',r:'對抗',nomp:true,hp:760,atk:26,spd:2.35,rng:120,mp:240,s:[
  SK('旋風斬',40,300,h=>aoe(h,h.x,h.y,150,70+h.atk)),
  SK('突刺',50,360,h=>{aim(h,350);dash(h,260);aoe(h,h.x,h.y,110,70+h.atk)}),
  SK('斬魂',100,1500,h=>{const t=aim(h,450);if(t){h.x=t.x-Math.cos(h.face)*40;h.y=t.y-Math.sin(h.face)*40}aoe(h,h.x,h.y,200,180+h.atk*1.5)}),
  SK('劍氣',50,300,h=>shot(h,9,500,20,90+h.atk,1)),
  SK('戰意',40,600,h=>heal(h,1,.18)),
  SK('盾擊',40,420,h=>{dash(h,100);aoe(h,h.x,h.y,120,50+h.atk*.6)})]},
-{n:'魯班',r:'射手',hp:470,atk:34,spd:3.1,rng:270,mp:260,s:[
+{n:'魯班',r:'射手',hp:470,atk:34,spd:2.2,rng:270,mp:260,s:[
  SK('炸彈',40,270,h=>{const p=tgt(h,420);aoe(h,p.x,p.y,130,70+h.atk*.7)}),
  SK('加農炮',60,420,h=>{aim(h,600);line(h,600,30,110+h.atk)}),
  SK('護衛重炮',120,1500,h=>{const p=tgt(h,700);aoe(h,p.x,p.y,260,240+h.atk*1.6)}),
  SK('瞄準砲',50,300,h=>shot(h,14,800,14,140+h.atk*1.1)),
  SK('地雷',50,480,h=>{const p=tgt(h,300);aoe(h,p.x,p.y,120,80+h.atk*.8)}),
  SK('閃步',30,500,h=>dash(h,160))]},
-{n:'朵莉亞',r:'輔助',hp:560,atk:22,spd:3.3,rng:200,mp:350,s:[
+{n:'朵莉亞',r:'輔助',hp:560,atk:22,spd:2.35,rng:200,mp:350,s:[
  SK('泡泡',40,300,h=>{heal(h,320,.18);aoe(h,h.x,h.y,140,50+h.atk*.6);if(h.mer)push(h,200,150)}),
  SK('衝浪',50,360,h=>{aim(h,300);dash(h,230);aoe(h,h.x,h.y,110,50+h.atk*.7);heal(h,200,.14);h.wet=300}),
  SK('大魚吃海',120,1500,h=>{aoe(h,h.x,h.y,330,120+h.atk);heal(h,330,.35)}),
@@ -464,16 +466,18 @@ function drawWorld(v){
   if(aimS&&aimS.ang!=null&&P[aimS.i]===v.p){const p=v.p;ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=4;ctx.setLineDash([10,8]);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+Math.cos(aimS.ang)*320,p.y+Math.sin(aimS.ang)*320);ctx.stroke();ctx.setLineDash([])}
 }
 function hudv(v){
-  const p=v.p,x=v.x+6,y=v.y+6;
-  ctx.fillStyle='rgba(10,20,28,.65)';ctx.fillRect(x,y,236,74);
-  ctx.fillStyle='#fff';ctx.font='12px sans-serif';ctx.textAlign='left';
-  ctx.fillText(trGame(`${p.cls.r}·${p.cls.n} Lv${p.lv}　金幣 ${p.gold}`),x+6,y+16);
-  ctx.fillText(trGame(`擊殺 ${kills[0]}:${kills[1]}　裝備 ${p.items.length}/6　技 ${p.sl.join('/')}${p.pt?' +'+p.pt:''}`),x+6,y+32);
-  ctx.fillText(trGame(`${p.bb>0?'[藍]':''}${p.rb>0?'[紅]':''}${tb[p.team].t>0?'[暴君]':''}${tb[p.team].z>0?'[主宰×'+tb[p.team].z+'波]':''}`),x+6,y+48);
-  ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(x+6,y+54,186,6);ctx.fillRect(x+6,y+63,186,6);
-  ctx.fillStyle='#3ccf6a';ctx.fillRect(x+6,y+54,186*cl(p.hp/p.max,0,1),6);ctx.fillStyle='#4f8cff';ctx.fillRect(x+6,y+63,186*cl(p.mp/p.mpm,0,1),6);
+  const p=v.p,x=v.x+6,y=v.y+6,cmp=H<520;
+  const pw=cmp?196:236,ph=cmp?60:74,fs=cmp?'11px':'12px',bw=cmp?152:186,bh=cmp?5:6;
+  const l1=y+11,l2=y+(cmp?24:32),l3=y+(cmp?36:48),b1=y+(cmp?42:54),b2=y+(cmp?50:63);
+  ctx.fillStyle='rgba(10,20,28,.65)';ctx.fillRect(x,y,pw,ph);
+  ctx.fillStyle='#fff';ctx.font=fs+' sans-serif';ctx.textAlign='left';
+  ctx.fillText(trGame(`${p.cls.r}·${p.cls.n} Lv${p.lv}　金幣 ${p.gold}`),x+6,cmp?l1+1:l1+5);
+  ctx.fillText(trGame(`擊殺 ${kills[0]}:${kills[1]}　裝備 ${p.items.length}/6　技 ${p.sl.join('/')}${p.pt?' +'+p.pt:''}`),x+6,cmp?l2+1:l2);
+  ctx.fillText(trGame(`${p.bb>0?'[藍]':''}${p.rb>0?'[紅]':''}${tb[p.team].t>0?'[暴君]':''}${tb[p.team].z>0?'[主宰×'+tb[p.team].z+'波]':''}`),x+6,cmp?l3+1:l3);
+  ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(x+6,b1,bw,bh);ctx.fillRect(x+6,b2,bw,bh);
+  ctx.fillStyle='#3ccf6a';ctx.fillRect(x+6,b1,bw*cl(p.hp/p.max,0,1),bh);ctx.fillStyle='#4f8cff';ctx.fillRect(x+6,b2,bw*cl(p.mp/p.mpm,0,1),bh);
   if(!p.alive){ctx.font='bold 20px sans-serif';ctx.textAlign='center';ctx.fillText(trGame('復活倒數 '+Math.ceil(p.rt/60)+' 秒'),v.x+v.w/2,v.y+v.h*.35)}
-  const mw=Math.min(150,v.w*.28),mh=mw*MH/MW*1.6,mx=v.x+v.w-mw-8,my=v.y+8;
+  const mw=Math.min(150,v.w*.28),mh=mw*MH/MW*1.6,mx=v.x+v.w-mw-8,my=v.y+(H<520?46:8);
   ctx.fillStyle='rgba(10,20,28,.7)';ctx.fillRect(mx,my,mw,mh);
   for(const e of E){if(!e.alive||hidden(e,v.team))continue;ctx.fillStyle=e.k==='mon'?MI[e.kind].c:e.team?RED:BLUE;const s=e.k==='minion'?2:e.k==='hero'?5:6;ctx.fillRect(mx+e.x/MW*mw-s/2,my+mh/2+(e.y-LY)/MH*mh*.9-s/2,s,s)}
 }
@@ -521,7 +525,8 @@ function mkCtl(){
     const g=document.createElement('div');g.className='g';g.style.right=mode2&&i===0?'calc(50% + 10px)':'14px';CB[i]=[];
     [0,1,3,4,5,2,6,7,8,9].forEach(j=>{
       const b=document.createElement('button');b.className=j===2?'ult':j===6?'atk':j>6?'up':'';
-      b.innerHTML=j>6?`<b>+</b>${'一二大'[j-7]}`:j===6?`<b>${keyLabel(i,'attack')}</b>普攻`:`<b>${controlKeyLabel(i,j)}</b>${p.cls.s[j][0]}<i></i>`;
+      const shortScreen=innerHeight<520;
+      b.innerHTML=j>6?`<b>+</b>${'一二大'[j-7]}`:j===6?`<b>${keyLabel(i,'attack')}</b>普攻`:`<b>${controlKeyLabel(i,j)}</b>${shortScreen?p.cls.s[j][0].slice(0,2):p.cls.s[j][0]}<i></i>`;
       b.onpointerdown=e=>{e.preventDefault();if(j>6)upg(p,j-7);else if(j===6)atkH[i]=true;else if(j===3)aimS={i,sx:e.clientX,sy:e.clientY,ang:null};else cast(p,j)};
       g.appendChild(b);CB[i][j]=b;
     });
@@ -533,12 +538,12 @@ function uiCtl(){
   P.forEach((p,i)=>{if(!CB[i])return;[7,8,9].forEach(j=>{const b=CB[i][j];if(b)b.style.display=(p.pt>0&&p.sl[j-7]<5&&!(j===9&&p.sl[2]>=Math.floor(p.lv/3)))?'block':'none'});for(let j=0;j<6;j++){const b=CB[i][j];if(!b)continue;b.lastElementChild.style.height=Math.min(100,p.sk[j]/p.cls.s[j][2]*100)+'%';b.style.opacity=(j<3&&p.sl[j]<1)?.3:(p.mp<mc(p,j)&&!p.cls.nomp)?.55:1}});
 }
 // ---------- 商店（單人） ----------
-const shopEl=[document.getElementById('shop'),document.getElementById('shop2')],oppEl=[document.getElementById('opp0'),document.getElementById('opp1')];let shopOpen=[false,false],shs='',ops=['',''];
+const shopEl=[document.getElementById('shop'),document.getElementById('shop2')],oppEl=[document.getElementById('opp0'),document.getElementById('opp1')];oppEl.forEach(el=>el.addEventListener('click',()=>el.classList.toggle('open')));let shopOpen=[false,false],shs='',ops=['',''];
 function renderShopOld(){shopEl.style.display=shopOpen&&!mode2?'block':'none';if(!shopOpen||mode2)return;const p=player;shopEl.innerHTML=ITEMS.map((it,i)=>`<button data-i="${i}" ${p.gold<it.c||p.items.length>=6?'disabled':''}>${it.n}　${it.c} 金<br><small>${it.d}</small></button>`).join('')+`<div style="font-size:12px;margin-top:4px">金幣 ${p.gold}　裝備欄 ${p.items.length}/6</div>`}
 function renderShopOld2(){[0,1].forEach(i=>{const el=shopEl[i],p=P[i],on=!!p&&shopOpen[i]&&(i===0||mode2);el.style.display=on?'block':'none';if(!on)return;el.style.left=mode2?(i?'75%':'25%'):'50%';el.innerHTML=ITEMS.map((it,j)=>`<button data-i="${j}" ${p.gold<it.c||p.items.length>=6?'disabled':''}>${it.n}　${it.c} 金<br><small>${it.d}</small></button>`).join('')+`<div style="font-size:12px;margin-top:4px">金幣 ${p.gold}　裝備欄 ${p.items.length}/6</div>`})}
 function renderShop(){[0,1].forEach(i=>{const el=shopEl[i],p=P[i],on=!!p&&shopOpen[i]&&(i===0||mode2);el.style.display=on?'grid':'none';if(!on)return;if(mode2){el.style.width='172px';el.style.left=i?'calc(100% - 180px)':'8px';el.style.transform='none';}else{el.style.width='min(300px,calc(100vw - 24px))';el.style.left='50%';el.style.transform='translateX(-50%)';}el.innerHTML=`<button data-x="1" style="grid-column:1/-1;text-align:center">✕ 關閉商店</button>`+ITEMS.map((it,j)=>`<button data-i="${j}" ${p.gold<it.c||p.items.length>=6?'disabled':''}>${it.n}　${it.c}金<br><small>${it.d}</small></button>`).join('')+`${p.items.length?'<div style="grid-column:1/-1;font-size:12px">出售（退 70%）：</div>'+p.items.map((j,k)=>`<button data-s="${k}" style="border-color:#e0a030">賣 ${ITEMS[j].n}<br><small>+${Math.floor(ITEMS[j].c*.7)} 金</small></button>`).join(''):''}<div style="grid-column:1/-1;font-size:12px">金幣 ${p.gold}　裝備欄 ${p.items.length}/6</div>`})}
 function toggleShop(i=0){if(i===1&&!mode2)return;shopOpen[i]=!shopOpen[i];shs=''}
-function updOpp(){[0,1].forEach(i=>{const el=oppEl[i],v=P[i];if(!v||(i===1&&!mode2)){el.style.display='none';return}const o=i===0?enemyH:player;el.style.display='block';el.style.left=i?'calc(50% + 8px)':'8px';const s=`對方：${o.cls.n} Lv${o.lv}<br>金幣 ${o.gold}　攻擊 ${Math.round(o.atk)}<br>裝備 ${o.items.length}/6：${o.items.length?o.items.map(j=>ITEMS[j].n).join('、'):'無'}`;if(s!==ops[i]){ops[i]=s;el.innerHTML=s}})}
+function updOpp(){[0,1].forEach(i=>{const el=oppEl[i],v=P[i];if(!v||(i===1&&!mode2)){el.style.display='none';return}const o=i===0?enemyH:player;el.style.display='block';el.style.left=i?'calc(50% + 8px)':'8px';const s=`<div class="o1">對方：${o.cls.n} Lv${o.lv}　<span style="color:#9fc7d8">⋯</span></div><div class="o2">金幣 ${o.gold}　攻擊 ${Math.round(o.atk)}<br>裝備 ${o.items.length}/6：${o.items.length?o.items.map(j=>ITEMS[j].n).join('、'):'無'}</div>`;if(s!==ops[i]){ops[i]=s;el.innerHTML=s}})}
 let sdn=null;shopEl.forEach((el,i)=>{el.addEventListener('pointerdown',e=>{sdn={x:e.clientX,y:e.clientY}});el.addEventListener('click',e=>{if(sdn&&Math.hypot(e.clientX-sdn.x,e.clientY-sdn.y)>10)return;const b=e.target.closest('button');if(b&&b.dataset.x){toggleShop(i);return}if(b&&b.dataset.s!==undefined){sell(P[i],+b.dataset.s);shs='';return}if(b&&!b.disabled){buy(P[i],+b.dataset.i);shs=''}})});
 document.getElementById('shopb').addEventListener('click',()=>toggleShop(0));document.getElementById('shopb2').addEventListener('click',()=>toggleShop(1));
 // ---------- 輸入 ----------
@@ -1023,17 +1028,20 @@ function openSettings(){
  const langOptions=Object.entries(GAME_LANGS).map(([v,n])=>`<option value="${v}">${n}</option>`).join('');
  const actionNames={up:'向上移動',down:'向下移動',left:'向左移動',right:'向右移動',attack:'普通攻擊',skill1:'技能一',skill2:'技能二',ultimate:'大招',aim:'瞄準／發射',skill4:'技能四',skill5:'技能五',upgrade1:'升級技能一',upgrade2:'升級技能二',upgradeUlt:'升級大招',shop:'打開商店'};
  const keyRows=[0,1].map(i=>`<h3>${i?'P2 鍵位':'P1 鍵位'}</h3><div class="keyGrid">${Object.entries(actionNames).map(([a,n])=>`<label>${n}<button type="button" class="keyPick" data-player="${i}" data-action="${a}">${keyLabel(i,a)}</button></label>`).join('')}</div>`).join('');
- panel('遊戲設置',`<label>語言 / Language <select id="langPick">${langOptions}</select></label><p>鍵位設定（點擊右側按鍵，再按下新按鍵）</p>${keyRows}<p><button id="keyReset">恢復預設鍵位</button></p><p>音效 / Sound <select id="soundPick"><option value="on">開啟 / On</option><option value="off">關閉 / Off</option></select></p><p>畫面比例：手機橫屏。此版本為本機單機原型。</p>`);
+ panel('遊戲設置',`<label>語言 / Language <select id="langPick">${langOptions}</select></label><p id="surrenderRow"><button id="setSurrender" style="border-color:#c0392b;color:#c0392b">投降／結束本局</button></p><p>鍵位設定（點擊右側按鍵，再按下新按鍵）</p>${keyRows}<p><button id="keyReset">恢復預設鍵位</button></p><p>音效 / Sound <select id="soundPick"><option value="on">開啟 / On</option><option value="off">關閉 / Off</option></select></p><p>畫面比例：手機橫屏。此版本為本機單機原型。</p>`);
  const close=document.getElementById('panelClose');if(close)close.onclick=()=>{extraPanel.style.display='none';if(settingsShouldResumeGame){paused=false;settingsShouldResumeGame=false}};
  const lang=document.getElementById('langPick');lang.value=currentLanguage();
  lang.onchange=()=>{localProfile.lang=lang.value;saveProfile();applyGameLanguage();openSettings();say(lang.value==='en'?'Language changed':lang.value==='zh-Hans'?'已切换简体中文':'已切換繁體中文')};
  document.querySelectorAll('.keyPick').forEach(b=>b.onclick=()=>{const i=+b.dataset.player,a=b.dataset.action;b.textContent='請按鍵…';const capture=e=>{e.preventDefault();e.stopPropagation();const k=e.key.toLowerCase();if(k==='escape'){b.textContent=keyLabel(i,a);document.removeEventListener('keydown',capture,true);return}const all=[0,1].flatMap(n=>Object.keys(DEFAULT_KEYS[n]).map(x=>[n,x]));if(all.some(([n,x])=>!(n===i&&x===a)&&String(keyFor(n,x)).toLowerCase()===k)){b.textContent='按鍵重複';setTimeout(()=>b.textContent=keyLabel(i,a),800);document.removeEventListener('keydown',capture,true);return}if(!localProfile.keybinds)localProfile.keybinds=[{},{}];localProfile.keybinds[i][a]=k;saveProfile();document.removeEventListener('keydown',capture,true);openSettings();if(typeof mkCtl==='function'&&P.length)mkCtl()};document.addEventListener('keydown',capture,true)});
  document.getElementById('keyReset').onclick=()=>{localProfile.keybinds=[{},{}];saveProfile();openSettings();if(P.length)mkCtl()};
+ const srow=document.getElementById('surrenderRow'),sbtn=document.getElementById('setSurrender');
+ if(srow){if(!P.length||!P[0]){srow.style.display='none'}else{sbtn.onclick=()=>{extraPanel.style.display='none';settingsShouldResumeGame=false;doSurrender()}}}
 }
 document.getElementById('settingsBtn').onclick=openSettings;
 document.getElementById('quitBtn').onclick=()=>{paused=true;extraPanel.style.display='none';showOv('返回主介面','本局已結束。可以重新選角開始遊戲。','返回選角');document.getElementById('ob2').onclick=()=>{const __mv2=document.querySelector('input[name=m]:checked').value;if(__mv2==='2'&&!online){showOv('線上對戰','請先在選角畫面下方填入暱稱，按「建立房間」或輸入房號「加入房間」。配對成功後，按「進入戰場」開始。','知道了');return}mode2=__mv2==='1';__offlineReset();init();mkCtl();paused=false;ov.style.display='none';shopOpen=[false,false];shs=''}};
 function doSurrender(){if(!confirm(trGame('確定要投降並結束本局嗎？')))return;paused=true;over=1;showOv('本局已投降','你已選擇投降。','返回主介面');document.getElementById('ob2').onclick=()=>{over=0;paused=true;ov.style.display='flex';document.getElementById('ot').textContent='峽谷對決';document.getElementById('ob').textContent='選擇英雄並開始遊戲';document.getElementById('ob2').textContent='開始遊戲'}}
 document.getElementById('surrenderBtn').onclick=doSurrender;
+try{document.getElementById('surrenderBtn').style.display='none'}catch(e){}
 document.getElementById('surrenderBtn2').onclick=doSurrender;
 // 讓水晶能攻擊進入射程的敵方英雄/小兵
 const oldTower=tower;
@@ -1336,15 +1344,79 @@ Object.assign(LEX,{
 });
 
 function gameLang(){return (typeof localProfile!=='undefined'&&localProfile.lang)||'zh-Hant'}
+Object.assign(LEX,{
+'遊客模式資料只存在這台手機，換手機或清除資料就會不見。':['游客模式资料只存在这台手机，换手机或清除资料就会不见。','Guest progress is stored only on this device. Switching phones or clearing data will lose it.'],'登入':['登录','Sign In'],'註冊':['注册','Sign Up'],'忘記密碼':['忘记密码','Forgot password'],
+'遊客遊玩':['游客游玩','Play as Guest'],'先遊客遊玩':['先游客游玩','Play as Guest'],'郵箱':['邮箱','Email'],
+'密碼':['密码','Password'],'設定密碼（至少 6 位）':['设置密码（至少 6 位）','Password (6+ characters)'],
+'再輸入一次密碼':['再输入一次密码','Repeat password'],'登入帳號':['登录账号','Sign In'],
+'用註冊時的郵箱和密碼登入，遊戲進度會跟著帳號。':['用注册时的邮箱和密码登录，游戏进度会跟着账号。','Sign in with the email and password you registered with; your progress follows the account.'],
+'註冊新帳號':['注册新账号','Create Account'],'用郵箱註冊，會寄一封驗證信，點信裡的連結就完成驗證。':['用邮箱注册，会寄一封验证信，点信里的链接就完成验证。','Register with your email. We send a verification email — tap the link inside to verify.'],
+'去信箱完成驗證':['去信箱完成验证','Check Your Email'],'驗證信已經寄出。':['验证信已经寄出。','Your verification email has been sent.'],
+'請打開信箱（含垃圾郵件匣），點信中「確認」連結，回來這裡按「已完成驗證，去登入」。':['请打开信箱（含垃圾邮件匣），点信中「确认」链接，回来这里按「已完成验证，去登录」。','Open your inbox (check spam too), tap the confirmation link, then come back and tap the button below.'],
+'已完成驗證，去登入':['已完成验证，去登录','Verified — go to Sign In'],'沒收到？重新寄一次':['没收到？重新寄一次','Didn\'t get it? Resend'],
+'取個名字':['取个名字','Pick a Name'],'這是好友和對戰時顯示的名字，之後可以在「個人資料」改。':['这是好友和对战时显示的名字，之后可以在「个人资料」改。','This name shows to friends and opponents. You can change it later in Profile.'],
+'你的名字':['你的名字','Your name'],'重設密碼':['重置密码','Reset Password'],
+'填註冊時的郵箱，會寄一封重設密碼的信。':['填注册时的邮箱，会寄一封重置密码的信。','Enter your registered email and we will send a reset link.'],
+'寄出重設信':['寄出重置信','Send reset link'],'回登入':['回登录','Back to Sign In'],'登出帳號':['登出账号','Sign Out'],
+'已登入：':['已登录：','Signed in: '],'遊客模式（未登入）':['游客模式（未登录）','Guest mode (not signed in)'],'未登入':['未登录','Not signed in'],'拒絕':['拒绝','Reject'],'暱稱':['昵称','Nickname'],'秒':['秒','s'],'同意':['同意','Accept'],'加入':['加入','Join'],
+'你們已經是好友':['你们已经是好友','You are already friends'],'已拒絕好友申請':['已拒绝好友申请','Friend request rejected'],
+'好友服務還在連線，請稍後再試':['好友服务还在连线，请稍后再试','Friend service is still connecting, please try again shortly'],
+'線上對戰':['在线对战','Online Match'],'房號 ':['房号 ','Room '],'狀態：':['状态：','Status: '],
+'連線失敗：':['连线失败：','Connection failed: '],'連線中…':['连线中…','Connecting…'],'已連線':['已连线','Connected'],
+'與伺服器斷線':['与服务器断线','Disconnected from server'],'狀態：尚未連線':['状态：尚未连线','Status: Not connected'],
+'Ⅱ 暫停':['Ⅱ 暂停','Ⅱ Pause'],'⚙ 設置':['⚙ 设置','⚙ Settings'],'進入戰場':['进入战场','Enter Battle'],
+'好友對決':['好友对决','Friendly Duel'],'邀請對戰':['邀请对战','Invite to Duel'],'重新匹配':['重新匹配','Rematch'],
+'對手已重新連線':['对手已重新连线','Opponent reconnected'],'對手已離開房間':['对手已离开房间','Opponent left the room'],
+'請先選擇好友':['请先选择好友','Choose a friend first'],'請輸入好友暱稱':['请输入好友昵称','Enter friend nickname'],
+'不能添加自己':['不能添加自己','You cannot add yourself'],'已送出申請，等待對方同意':['已送出申请，等待对方同意','Request sent, waiting for approval'],
+'好友申請已送出，等待對方同意':['好友申请已送出，等待对方同意','Friend request sent, waiting for approval'],
+'收到一筆測試好友申請':['收到一笔测试好友申请','Received a test friend request'],
+'已同意好友申請':['已同意好友申请','Friend request accepted'],
+'對方已同意，你們已成為好友':['对方已同意，你们已成为好友','Request accepted — you are now friends'],
+'對方已拒絕，請重新添加':['对方已拒绝，请重新添加','Request declined — please try again'],
+'已重新送出申請，等待對方同意':['已重新送出申请，等待对方同意','Request re-sent, waiting for approval'],
+'好友已把你清除':['好友已把你清除','Removed from friend list'],'刪除好友':['删除好友','Remove friend'],
+'重新添加':['重新添加','Send again'],'新增好友申請':['新增好友申请','Send friend request'],'加好友':['加好友','Add friend'],
+'重新送出':['重新送出','Send again'],'請對方也開著遊戲，從「線上的玩家」重新加一次':['请对方也开着游戏，从「线上的玩家」重新加一次','Ask your friend to keep the game open, then add again from Online Players'],
+'請選擇 PNG、JPG、WEBP 或 GIF 圖片':['请选择 PNG、JPG、WEBP 或 GIF 图片','Please choose a PNG, JPG, WEBP or GIF image'],
+'頭像圖片請小於 2 MB':['头像图片请小于 2 MB','Avatar image must be under 2 MB'],'頭像上傳成功':['头像上传成功','Avatar uploaded'],
+'圖片讀取失敗，請換一張圖片':['图片读取失败，请换一张图片','Could not read the image, please try another'],
+'對方拒絕了申請':['对方拒绝了申请','Request declined'],'已拒絕邀請':['已拒绝邀请','Invitation declined'],
+'對手已加入：':['对手已加入：','Opponent joined: '],'對手已離開':['对手已离开','Opponent left'],
+'訊息量異常，已被伺服器斷線':['信息量异常，已被服务器断线','Too many messages — disconnected by server'],
+'查無此房號':['查无此房号','Room not found'],'房間已滿（只能兩人）':['房间已满（只能两人）','Room is full (two players only)'],
+'請輸入 4 位數字房號':['请输入 4 位数字房号','Enter a 4-digit room code'],'加入房間中…':['加入房间中…','Joining room…'],
+'查無此房號（房主可能已離開）':['查无此房号（房主可能已离开）','Room not found (host may have left)'],
+'對手尚未加入':['对手尚未加入','Opponent has not joined yet'],'對戰進行中（房號 ':['对战进行中（房号 ','Match in progress (room '],
+'建立房間':['建立房间','Create Room'],'加入房間':['加入房间','Join Room'],'✕ 關閉商店':['✕ 关闭商店','✕ Close Shop'],
+'同一部手機／電腦，雙人分屏對戰':['同一部手机／电脑，双人分屏对战','Same device split-screen duel'],
+'查看線上對戰需求':['查看在线对战需求','See online match requirements'],'開始好友對決':['开始好友对决','Start Friendly Duel'],
+'恢復預設頭像':['恢复默认头像','Reset avatar'],'已使用預設頭像':['已使用默认头像','Default avatar in use'],
+'已恢復預設頭像':['已恢复默认头像','Default avatar restored'],'再玩一次':['再玩一次','Play Again'],
+'好友申請':['好友申请','Friend Request'],'好友':['好友','Friends'],
+'我的好友':['我的好友','My Friends'],'線上的玩家':['线上的玩家','Online Players'],'已送出的申請':['已送出的申请','Sent Requests'],
+'收到的好友申請':['收到的好友申请','Received Requests'],'好友通知':['好友通知','Friend Notices'],
+'目前沒有好友':['目前没有好友','No friends yet'],'目前沒有其他線上玩家':['目前没有其他线上玩家','No other players online'],
+'沒有待處理的申請':['没有待处理的申请','No pending requests'],'沒有收到申請':['没有收到申请','No incoming requests'],
+'沒有通知':['没有通知','No notices'],'在線':['在线','Online'],'離線':['离线','Offline'],
+'好友服務已連線':['好友服务已连线','Friend service connected'],'我的 ID：':['我的 ID：','My ID: '],
+'對方按「加入」後，你按畫面下方的「進入戰場」就會開始。':['对方按「加入」后，你按画面下方的「进入战场」就会开始。','Once your friend taps Join, tap Enter Battle to start.'],
+'已邀請 ':['已邀请 ','Invited '],'邀請已送出':['邀请已送出','Invitation sent'],'好友對戰邀請':['好友对战邀请','Duel Invitation'],
+'攜帶：':['携带：','Loadout: '],'匹配／房間':['匹配／房间','Match / Room'],'段位排名':['段位排名','Rankings'],
+'開始遊戲':['开始游戏','Start Game'],'英雄':['英雄','Hero'],'金幣':['金币','Gold'],'擊殺':['击杀','Kills'],
+'我的等級':['我的等级','My Level'],'技能':['技能','Skills'],'裝備':['装备','Items'],'生命':['生命','HP'],'法力':['法力','Mana']
+});
 function trGame(s){
  if(s==null)return s;
  let out=String(s),lang=gameLang();
+ if(out.indexOf('@')>=0)return out; // 信箱／連結不做翻譯，避免被詞表改壞
  const entries=Object.entries(LEX).sort((a,b)=>b[0].length-a[0].length);
  for(const [src,variants] of entries){
    const simp=variants[0],eng=variants[1];
    if(lang==='zh-Hant'){
      if(simp&&simp!==src)out=out.split(simp).join(src);
-     if(eng&&eng!==src)out=out.split(eng).join(src);
+     // 英文回中文只處理長度>=3的詞，避免像 s、On 這種短詞誤傷其他文字
+     if(eng&&eng!==src&&eng.length>=3)out=out.split(eng).join(src);
    }else{
      const target=lang==='zh-Hans'?simp:eng;
      if(src&&src!==target)out=out.split(src).join(target);
@@ -1357,16 +1429,35 @@ function trGame(s){
  }
  return out;
 }
+/* 【1.1.17 修復】翻譯改為「記錄原始文字 → 每次從原文重新翻譯」
+   之前是拿已翻譯的文字再翻一次，切到英文再切回中文會殘留、APK 內更明顯像「切換無效」。 */
+const __TX_TEXT=new WeakMap(), __TX_ATTR=new WeakMap();
+function __txText(n){
+  const cur=n.nodeValue||'';
+  let rec=__TX_TEXT.get(n);
+  if(!rec||rec.a!==cur){rec={o:cur,a:cur};__TX_TEXT.set(n,rec);}
+  const out=trGame(rec.o);
+  if(out!==cur)n.nodeValue=out;
+  rec.a=out;
+}
+function __txAttr(n,attr){
+  let rec=__TX_ATTR.get(n); if(!rec){rec={};__TX_ATTR.set(n,rec);}
+  const cur=n.getAttribute(attr)||'';
+  let st=rec[attr];
+  if(!st||st.a!==cur){st={o:cur,a:cur};rec[attr]=st;}
+  const out=trGame(st.o);
+  if(out!==cur)n.setAttribute(attr,out);
+  st.a=out;
+}
 function translatePage(){
  const walk=n=>{
   if(n.nodeType===3){
-   const old=n.nodeValue, z=old.trim();
-   if(z){const next=old.replace(z,trGame(z));if(next!==old)n.nodeValue=next;}
+   if((n.nodeValue||'').trim())__txText(n);
   } else if(n.nodeType===1){
-   // 【1.2.0 修復】不要翻譯 script / style 內容，否則會把程式碼識別字改壞（如 localProfile→local個人資料）導致載入中斷
+   // 不要翻譯 script / style 內容，否則會把程式碼識別字改壞
    if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='TEXTAREA')return;
    for(const a of ['placeholder','title','aria-label']){
-    if(n.hasAttribute(a)){const old=n.getAttribute(a),next=trGame(old);if(next!==old)n.setAttribute(a,next);}
+    if(n.hasAttribute(a))__txAttr(n,a);
    }
    for(const c of [...n.childNodes])walk(c);
   }
@@ -1507,5 +1598,546 @@ window.addEventListener('DOMContentLoaded',translatePage);
 })();
 </script>
 
+<script>
+/* ===== 1.1.16 線上好友：Supabase Realtime 大廳（跨裝置申請 / 同意 / 邀請對戰） ===== */
+(function(){
+  var LB='canyon-duel-lobby';
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  if(!localProfile.uid){localProfile.uid='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);saveProfile()}
+  function ME(){return {uid:localProfile.uid,name:(localProfile.name||'召喚師')}}
+  if(!Array.isArray(localProfile.friends))localProfile.friends=[];
+  localProfile.friends=localProfile.friends.map(function(f){return typeof f==='string'?{uid:'',name:f}:{uid:(f&&f.uid)||'',name:(f&&f.name)||''}}).filter(function(f){return f.name});
+  ['friendRequests','incomingRequests','friendNotices'].forEach(function(k){if(!Array.isArray(localProfile[k]))localProfile[k]=[]});
+  saveProfile();
+  function F(){return localProfile.friends}
+  function OUT(){return localProfile.friendRequests}
+  function IN(){return localProfile.incomingRequests}
+  function NT(){return localProfile.friendNotices}
+  function hasFriend(uid){return !!uid&&F().some(function(f){return f.uid===uid})}
+  function pushNotice(t){NT().push(t);if(NT().length>30)NT().splice(0,NT().length-30);saveProfile()}
+
+  var cli=null,ch=null,ready=false,online={},openView='';
+
+  function connect(){
+    if(ch)return;
+    var loader=(typeof sbLoad==='function')?sbLoad():Promise.reject(new Error('no'));
+    loader.then(function(){
+      cli=window.supabase.createClient(SB_URL,SB_KEY);
+      ch=cli.channel(LB,{config:{broadcast:{self:false},presence:{key:localProfile.uid}}});
+      ch.on('presence',{event:'sync'},function(){
+        online={};
+        try{
+          var st=ch.presenceState()||{};
+          Object.keys(st).forEach(function(k){
+            (st[k]||[]).forEach(function(m){
+              if(m&&m.uid&&m.uid!==localProfile.uid)online[m.uid]={uid:m.uid,name:m.name||'玩家'};
+            });
+          });
+        }catch(e){}
+        refreshView();
+      });
+      ch.on('broadcast',{event:'fr'},function(pkt){var p=pkt&&pkt.payload;if(p&&p.to===localProfile.uid)recvReq(p)});
+      ch.on('broadcast',{event:'fr:ok'},function(pkt){var p=pkt&&pkt.payload;if(p&&p.to===localProfile.uid)gotOk(p)});
+      ch.on('broadcast',{event:'fr:no'},function(pkt){var p=pkt&&pkt.payload;if(p&&p.to===localProfile.uid)gotNo(p)});
+      ch.on('broadcast',{event:'duel'},function(pkt){var p=pkt&&pkt.payload;if(p&&p.to===localProfile.uid)recvDuel(p)});
+      ch.subscribe(function(st){
+        if(st==='SUBSCRIBED'){ready=true;try{ch.track(ME())}catch(e){}refreshView()}
+      });
+    }).catch(function(){});
+  }
+  function send(ev,payload){if(!ch||!ready)return false;try{ch.send({type:'broadcast',event:ev,payload:payload});return true}catch(e){return false}}
+  function refreshView(){try{if(openView==='friends')renderFriends();else if(openView==='duel')renderDuel()}catch(e){}}
+  function closePanel(){try{extraPanel.style.display='none'}catch(e){}openView=''}
+
+  function recvReq(p){
+    var from={uid:p.from&&p.from.uid,name:(p.from&&p.from.name)||'玩家'};
+    if(!from.uid||from.uid===localProfile.uid)return;
+    if(hasFriend(from.uid)){send('fr:ok',{to:from.uid,from:ME()});return}
+    if(!IN().some(function(r){return r.uid===from.uid})){
+      IN().push({uid:from.uid,name:from.name,at:Date.now()});
+      pushNotice(from.name+' 送來好友申請');
+    }
+    openView='';
+    var h=[];
+    h.push('<p><b>'+esc(from.name)+'</b> 想把你加為好友。</p>');
+    h.push('<p style="font-size:12px;opacity:.8">按「同意」之後，雙方會互相出現在好友清單。</p>');
+    h.push('<p><button id="frYes" type="button">同意</button> <button id="frNo" type="button" class="danger">拒絕</button></p>');
+    panel('好友申請',h.join(''));
+    var y=document.getElementById('frYes'),n=document.getElementById('frNo');
+    if(y)y.onclick=function(){doAccept(from)};
+    if(n)n.onclick=function(){doReject(from)};
+  }
+  function doAccept(from){
+    if(!hasFriend(from.uid))F().push({uid:from.uid,name:from.name});
+    localProfile.incomingRequests=IN().filter(function(r){return r.uid!==from.uid});
+    pushNotice('已同意 '+from.name+' 的好友申請');
+    saveProfile();send('fr:ok',{to:from.uid,from:ME()});
+    closePanel();say('已加 '+from.name+' 為好友');refreshView();
+  }
+  function doReject(from){
+    localProfile.incomingRequests=IN().filter(function(r){return r.uid!==from.uid});
+    saveProfile();send('fr:no',{to:from.uid,from:ME()});closePanel();say('已拒絕好友申請');refreshView();
+  }
+  function gotOk(p){
+    var f={uid:p.from&&p.from.uid,name:(p.from&&p.from.name)||'好友'};
+    if(!f.uid)return;
+    if(!hasFriend(f.uid))F().push(f);
+    localProfile.friendRequests=OUT().filter(function(r){return r.uid!==f.uid});
+    pushNotice(f.name+' 同意了你的好友申請');
+    saveProfile();say(f.name+' 已成為你的好友');refreshView();
+  }
+  function gotNo(p){
+    var uid=p.from&&p.from.uid;if(!uid)return;
+    OUT().forEach(function(r){if(r.uid===uid)r.status='rejected'});
+    pushNotice(((p.from&&p.from.name)||'對方')+' 拒絕了你的好友申請');
+    saveProfile();say('對方拒絕了申請');refreshView();
+  }
+
+  function requestFriend(p,exist){
+    if(!ready){say('好友服務還在連線，請稍後再試');return}
+    if(!p.uid){say('請對方也開著遊戲，從「線上的玩家」重新加一次');return}
+    if(hasFriend(p.uid)){say('你們已經是好友');return}
+    if(!online[p.uid]){say(p.name+' 目前不在線上，請對方先開著遊戲');return}
+    if(exist){exist.status='pending';exist.at=Date.now()}
+    else OUT().push({uid:p.uid,name:p.name,status:'pending',at:Date.now()});
+    saveProfile();send('fr',{to:p.uid,from:ME()});
+    say('已送出好友申請給 '+p.name);renderFriends();
+  }
+
+  function renderFriends(){
+    openView='friends';
+    var friends=F(),out=OUT(),inc=IN(),nt=NT();
+    var others=Object.keys(online).map(function(k){return online[k]}).filter(function(p){return !hasFriend(p.uid)});
+    var h=[];
+    h.push('<p>我的 ID：<b>'+esc(localProfile.uid)+'</b>　'+(ready?'<span style="color:#3a9b68">● 好友服務已連線</span>':'<span style="color:#b56b21">連線中…</span>')+'</p>');
+    h.push('<p style="font-size:12px;opacity:.8">加好友：請對方也開著遊戲，他的名字會出現在下方「線上的玩家」，點「加好友」；對方會收到同意／拒絕視窗。</p>');
+    h.push('<h3>線上的玩家</h3><div>'+(others.length?others.map(function(p,i){
+      return '<p style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>'+esc(p.name)+'</b><button type="button" data-add="'+i+'">加好友</button></p>';
+    }).join(''):'<p>目前沒有其他線上玩家</p>')+'</div>');
+    h.push('<h3>我的好友（'+friends.filter(function(f){return online[f.uid]}).length+'/'+friends.length+' 在線）</h3><div>'+(friends.length?friends.map(function(f,i){
+      var on=!!online[f.uid];
+      return '<p style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);padding:8px;border-radius:8px"><b>'+esc(f.name)+'</b><span style="color:'+(on?'#3a9b68':'#999')+'">'+(on?'● 在線':'○ 離線')+'</span><button type="button" data-duel="'+i+'" '+(on?'':'disabled')+'>邀請對戰</button><button type="button" class="danger" data-fdel="'+i+'">刪除</button></p>';
+    }).join(''):'<p>目前沒有好友</p>')+'</div>');
+    h.push('<h3>已送出的申請</h3><div>'+(out.length?out.map(function(r,i){
+      return '<p style="border:1px solid var(--line);padding:8px;border-radius:8px">'+esc(r.name)+'：<b>'+(r.status==='rejected'?'對方已拒絕':'等待對方同意')+'</b> <button type="button" data-resend="'+i+'">重新送出</button></p>';
+    }).join(''):'<p>沒有待處理的申請</p>')+'</div>');
+    h.push('<h3>收到的好友申請</h3><div>'+(inc.length?inc.map(function(r,i){
+      return '<p style="border:1px solid var(--line);padding:8px;border-radius:8px">'+esc(r.name)+' 想加你為好友 <button type="button" data-accept="'+i+'">同意</button><button type="button" class="danger" data-reject="'+i+'">拒絕</button></p>';
+    }).join(''):'<p>沒有收到申請</p>')+'</div>');
+    h.push('<h3>好友通知</h3><div>'+(nt.length?nt.slice(-6).reverse().map(function(n){return '<p style="color:#b56b21">'+esc(n)+'</p>'}).join(''):'<p>沒有通知</p>')+'</div>');
+    panel('好友',h.join(''));
+    var bind=function(sel,fn){Array.prototype.forEach.call(document.querySelectorAll(sel),function(b){b.addEventListener('click',fn)})};
+    bind('[data-add]',function(e){var p=others[+e.currentTarget.dataset.add];if(p)requestFriend(p,null)});
+    bind('[data-accept]',function(e){var r=IN()[+e.currentTarget.dataset.accept];if(r)doAccept({uid:r.uid,name:r.name})});
+    bind('[data-reject]',function(e){var r=IN()[+e.currentTarget.dataset.reject];if(r)doReject({uid:r.uid,name:r.name})});
+    bind('[data-resend]',function(e){var r=OUT()[+e.currentTarget.dataset.resend];if(r)requestFriend({uid:r.uid,name:r.name},r)});
+    bind('[data-fdel]',function(e){var i=+e.currentTarget.dataset.fdel,f=F()[i];if(!f)return;F().splice(i,1);pushNotice('已刪除好友 '+f.name);saveProfile();renderFriends()});
+    bind('[data-duel]',function(e){var f=F()[+e.currentTarget.dataset.duel];if(f)inviteDuel(f)});
+  }
+
+  function renderDuel(){
+    openView='duel';
+    var friends=F();
+    var h=[];
+    h.push('<p>選一位在線好友按「邀請對戰」，系統會自動開房間並把房號送過去。</p>');
+    h.push('<div>'+(friends.length?friends.map(function(f,i){
+      var on=!!online[f.uid];
+      return '<p style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);padding:8px;border-radius:8px"><b>'+esc(f.name)+'</b><span style="color:'+(on?'#3a9b68':'#999')+'">'+(on?'● 在線':'○ 離線')+'</span><button type="button" data-duel="'+i+'" '+(on?'':'disabled')+'>邀請對戰</button></p>';
+    }).join(''):'<p>還沒有好友。先到「好友」把線上玩家加成好友。</p>')+'</div>');
+    h.push('<p style="font-size:12px;opacity:.8">對方按「加入」後，兩人都要按畫面上的「進入戰場」。好友離線時按鈕是灰的。</p>');
+    panel('好友對決',h.join(''));
+    Array.prototype.forEach.call(document.querySelectorAll('[data-duel]'),function(b){
+      b.addEventListener('click',function(e){var f=F()[+e.currentTarget.dataset.duel];if(f)inviteDuel(f)});
+    });
+  }
+
+  function setOnlineMode(){
+    var r=document.querySelector('input[name=m][value="2"]');
+    if(!r)return;
+    r.checked=true;
+    try{r.dispatchEvent(new Event('change'))}catch(e){}
+    try{var ev=document.createEvent('HTMLEvents');ev.initEvent('change',true,false);r.dispatchEvent(ev)}catch(e){}
+    var nick=document.getElementById('nickName');
+    if(nick&&!nick.value)nick.value=localProfile.name||'玩家';
+  }
+
+  function inviteDuel(f){
+    if(!ready){say('好友服務還在連線，請稍後再試');return}
+    if(!online[f.uid]){say(f.name+' 目前不在線上');return}
+    setOnlineMode();
+    closePanel();
+    netCreate().then(function(){
+      var code=__myCode;
+      var hero=(typeof HEROES!=='undefined'&&typeof sel!=='undefined'&&HEROES[sel[0]])?HEROES[sel[0]].n:'';
+      send('duel',{to:f.uid,from:ME(),code:code,hero:hero});
+      var h=[];
+      h.push('<p>已邀請 <b>'+esc(f.name)+'</b>，房號 <b>'+code+'</b>。</p>');
+      h.push('<p>對方按「加入」後，你按畫面下方的「進入戰場」就會開始。</p>');
+      panel('邀請已送出',h.join(''));
+    });
+  }
+
+  function recvDuel(p){
+    if(!p||!p.code)return;
+    openView='';
+    var h=[];
+    h.push('<p><b>'+esc(p.name||'好友')+'</b> 邀請你對戰，房號 <b>'+esc(p.code)+'</b>。</p>');
+    h.push('<p><button id="duelYes" type="button">加入</button> <button id="duelNo" type="button" class="danger">拒絕</button></p>');
+    panel('好友對戰邀請',h.join(''));
+    var y=document.getElementById('duelYes'),n=document.getElementById('duelNo');
+    if(y)y.onclick=function(){
+      setOnlineMode();
+      var rc=document.getElementById('roomCode');if(rc)rc.value=p.code;
+      closePanel();netJoin();
+      say('已加入 '+((p.name)||'好友')+' 的房間，請按「進入戰場」');
+    };
+    if(n)n.onclick=function(){closePanel();say('已拒絕邀請')};
+  }
+
+  function rebind(id,fn){
+    var old=document.getElementById(id);if(!old)return false;
+    var nu=old.cloneNode(true);old.parentNode.replaceChild(nu,old);nu.onclick=fn;return true
+  }
+  rebind('friendsBtn',renderFriends);
+  rebind('friendDuelBtn',renderDuel);
+  connect();
+})();
+
+</script>
+<script>
+/* ===== 1.2.0 帳號系統：Supabase Auth（郵箱註冊 / 登入 / 暱稱 / 遊客模式） ===== */
+(function(){
+  var LS_GUEST='gvd_guest', LS_MODE='gvd_account_mode';
+  var sbx=null, session=null, gate=null, view='login', busy=false, msg='', msgType='err';
+  var booted=false, bootFail=false;
+
+  function tx(s){try{return (typeof trGame==='function')?trGame(s):s}catch(e){return s}}
+  function el(id){return document.getElementById(id)}
+  function client(){
+    if(sbx)return sbx;
+    sbx=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    return sbx;
+  }
+  function user(){return session?session.user:null}
+  function nick(){try{var u=user();return (u&&u.user_metadata&&u.user_metadata.nickname)||''}catch(e){return ''}}
+  function hasNick(){return !!nick()}
+
+  /* ---------- 閘門 UI ---------- */
+  function makeGate(){
+    if(gate)return gate;
+    gate=document.createElement('div');
+    gate.id='gvdAuthGate';
+    gate.style.cssText='position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(5,10,16,.97);overflow:auto;padding:16px';
+    gate.innerHTML='<div id="gvdAuthCard" style="width:100%;max-width:420px;background:#0f1a26;border:1px solid #2a3a4a;border-radius:16px;padding:18px;color:#dbe6f2;box-sizing:border-box"></div>';
+    document.body.appendChild(gate);
+    return gate;
+  }
+  function showGate(v){
+    makeGate(); view=v||view; 
+    render();
+    gate.style.display='flex';
+  }
+  function hideGate(){if(gate)gate.style.display='none'}
+
+  function inputCss(){return 'width:100%;box-sizing:border-box;padding:11px 12px;margin:6px 0 10px;border-radius:9px;border:1px solid #2f4257;background:#0b141d;color:#e7f0fa;font-size:15px'}
+  function btnCss(primary){return 'width:100%;padding:12px;margin-top:6px;border-radius:9px;border:1px solid '+(primary?'#3f7fbf':'#32465b')+';background:'+(primary?'#1d4f80':'#16232f')+';color:#eaf3fb;font-size:15px;cursor:pointer'}
+  function linkCss(){return 'display:inline-block;margin:8px 6px 0 0;padding:8px 10px;border-radius:8px;border:1px solid #32465b;background:transparent;color:#9fc0dd;font-size:13px;cursor:pointer'}
+
+  function header(title,sub){
+    var h=[];
+    h.push('<h2 style="margin:0 0 4px;font-size:19px;color:#fff">'+tx(title)+'</h2>');
+    if(sub)h.push('<p style="margin:0 0 12px;font-size:12px;color:#8ba6c0">'+sub+'</p>');
+    return h.join('');
+  }
+  function errBox(){
+    if(!msg)return '';
+    var c=msgType==='ok'?'#2f7d5a':'#8d3b3b';
+    return '<p id="gvdMsg" style="margin:0 0 10px;padding:9px;border-radius:8px;background:'+c+';color:#f2f7fb;font-size:13px">'+msg+'</p>';
+  }
+  function tabs(){
+    var h=[];
+    h.push('<div style="display:flex;gap:8px;margin-bottom:12px">');
+    h.push('<button id="gvdTabLogin" style="flex:1;padding:9px;border-radius:8px;border:1px solid '+(view==='register'?'#32465b':'#3f7fbf')+';background:'+(view==='register'?'transparent':'#1d4f80')+';color:#eaf3fb;font-size:14px;cursor:pointer">'+tx('登入')+'</button>');
+    h.push('<button id="gvdTabReg" style="flex:1;padding:9px;border-radius:8px;border:1px solid '+(view==='register'?'#3f7fbf':'#32465b')+';background:'+(view==='register'?'#1d4f80':'transparent')+';color:#eaf3fb;font-size:14px;cursor:pointer">'+tx('註冊')+'</button>');
+    h.push('</div>');
+    return h.join('');
+  }
+
+  function render(){
+    var card=el('gvdAuthCard'); if(!card)return;
+    var h=[];
+    if(view==='login'){
+      h.push(header('登入帳號','用註冊時的郵箱和密碼登入，遊戲進度會跟著帳號。'));
+      h.push(tabs());
+      h.push(errBox());
+      h.push('<input id="gvdEmail" type="email" autocomplete="username" placeholder="'+tx('郵箱')+'" style="'+inputCss()+'">');
+      h.push('<input id="gvdPass" type="password" autocomplete="current-password" placeholder="'+tx('密碼')+'" style="'+inputCss()+'">');
+      h.push('<button id="gvdDoLogin" style="'+btnCss(true)+'">'+tx('登入')+'</button>');
+      h.push('<div style="margin-top:10px;text-align:center">');
+      h.push('<button id="gvdForgot" style="'+linkCss()+'">'+tx('忘記密碼')+'</button>');
+      h.push('<button id="gvdGuest" style="'+linkCss()+'">'+tx('遊客遊玩')+'</button>');
+      h.push('</div>');
+      h.push('<p style="margin:12px 0 0;font-size:11px;color:#7d95ab">'+tx('遊客模式資料只存在這台手機，換手機或清除資料就會不見。')+'</p>');
+    }
+    if(view==='register'){
+      h.push(header('註冊新帳號','用郵箱註冊，會寄一封驗證信，點信裡的連結就完成驗證。'));
+      h.push(tabs());
+      h.push(errBox());
+      h.push('<input id="gvdEmail" type="email" autocomplete="username" placeholder="'+tx('郵箱')+'" style="'+inputCss()+'">');
+      h.push('<input id="gvdPass" type="password" autocomplete="new-password" placeholder="'+tx('設定密碼（至少 6 位）')+'" style="'+inputCss()+'">');
+      h.push('<input id="gvdPass2" type="password" autocomplete="new-password" placeholder="'+tx('再輸入一次密碼')+'" style="'+inputCss()+'">');
+      h.push('<button id="gvdDoReg" style="'+btnCss(true)+'">'+tx('註冊')+'</button>');
+      h.push('<div style="margin-top:10px;text-align:center"><button id="gvdGuest" style="'+linkCss()+'">'+tx('先遊客遊玩')+'</button></div>');
+    }
+    if(view==='confirm'){
+      h.push(header('去信箱完成驗證','驗證信已經寄出。'));
+      h.push(errBox());
+      h.push('<p style="font-size:13px;line-height:1.7;color:#b8cddf">'+tx('請打開信箱（含垃圾郵件匣），點信中「確認」連結，回來這裡按「已完成驗證，去登入」。')+'</p>');
+      h.push('<p style="font-size:12px;color:#8ba6c0;word-break:break-all">'+ (window.__gvdLastEmail||'') +'</p>');
+      h.push('<button id="gvdToLogin" style="'+btnCss(true)+'">'+tx('已完成驗證，去登入')+'</button>');
+      h.push('<button id="gvdResend" style="'+btnCss(false)+'">'+tx('沒收到？重新寄一次')+'</button>');
+    }
+    if(view==='nick'){
+      h.push(header('取個名字','這是好友和對戰時顯示的名字，之後可以在「個人資料」改。'));
+      h.push(errBox());
+      h.push('<input id="gvdNick" maxlength="16" placeholder="'+tx('你的名字')+'" style="'+inputCss()+'">');
+      h.push('<button id="gvdDoNick" style="'+btnCss(true)+'">'+tx('開始遊戲')+'</button>');
+    }
+    if(view==='forgot'){
+      h.push(header('重設密碼','填註冊時的郵箱，會寄一封重設密碼的信。'));
+      h.push(errBox());
+      h.push('<input id="gvdEmail" type="email" placeholder="'+tx('郵箱')+'" style="'+inputCss()+'">');
+      h.push('<button id="gvdDoForgot" style="'+btnCss(true)+'">'+tx('寄出重設信')+'</button>');
+      h.push('<div style="margin-top:10px"><button id="gvdToLogin" style="'+linkCss()+'">'+tx('回登入')+'</button></div>');
+    }
+    card.innerHTML=h.join('');
+    bind();
+  }
+
+  function setMsg(t,type){msg=t||'';msgType=type||'err'}
+  function val(id){var e=el(id);return e?(e.value||'').trim():''}
+  function okEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)}
+  function lock(v){busy=v}
+
+  function bind(){
+    var b;
+    if(b=el('gvdTabLogin'))b.onclick=function(){setMsg('');showGate('login')};
+    if(b=el('gvdTabReg'))b.onclick=function(){setMsg('');showGate('register')};
+    if(b=el('gvdGuest'))b.onclick=function(){try{localStorage.setItem(LS_GUEST,'1')}catch(e){}hideGate();if(typeof say==='function')say('遊客模式：進度只存在這台手機')};
+    if(b=el('gvdForgot'))b.onclick=function(){setMsg('');showGate('forgot')};
+    if(b=el('gvdToLogin'))b.onclick=function(){setMsg('');showGate('login')};
+    if(b=el('gvdDoLogin'))b.onclick=doLogin;
+    if(b=el('gvdDoReg'))b.onclick=doRegister;
+    if(b=el('gvdResend'))b.onclick=doResend;
+    if(b=el('gvdDoForgot'))b.onclick=doForgot;
+    if(b=el('gvdDoNick'))b.onclick=doNick;
+    ['gvdPass','gvdPass2'].forEach(function(id){var e=el(id);if(e)e.onkeydown=function(ev){if(ev.key==='Enter'){ if(view==='login')doLogin(); else doRegister(); }}});
+    if(b=el('gvdEmail'))b.onkeydown=function(ev){if(ev.key==='Enter'){ if(view==='login')doLogin(); }};
+  }
+
+  function doLogin(){
+    if(busy)return;
+    var email=val('gvdEmail'), pass=val('gvdPass');
+    if(!okEmail(email)){setMsg('請填正確的郵箱');render();return}
+    if(!pass){setMsg('請填密碼');render();return}
+    lock(true);setMsg('登入中…','ok');render();
+    client().auth.signInWithPassword({email:email,password:pass}).then(function(r){
+      lock(false);
+      if(r.error){
+        var m=r.error.message||'';
+        if(/Invalid login credentials/i.test(m))setMsg('信箱或密碼不對，請再確認一次');
+        else if(/Email not confirmed/i.test(m))setMsg('這個信箱還沒驗證，請先去信箱點確認連結');
+        else if(/rate|too many/i.test(m))setMsg('嘗試太多次，等一下再試');
+        else setMsg(m);
+        render();return;
+      }
+      setMsg('');
+      afterLogin(r.data.session);
+    }).catch(function(e){lock(false);setMsg('連線失敗：'+(e.message||''));render()});
+  }
+
+  function doRegister(){
+    if(busy)return;
+    var email=val('gvdEmail'), pass=val('gvdPass'), pass2=val('gvdPass2');
+    if(!okEmail(email)){setMsg('請填正確的郵箱');render();return}
+    if(pass.length<6){setMsg('密碼至少 6 位');render();return}
+    if(pass!==pass2){setMsg('兩次輸入的密碼不一樣');render();return}
+    lock(true);setMsg('送出中…','ok');render();
+    var redirect=location.origin+location.pathname;
+    client().auth.signUp({email:email,password:pass,options:{emailRedirectTo:redirect,data:{nickname:''}}}).then(function(r){
+      lock(false);
+      if(r.error){
+        var m=r.error.message||'';
+        if(/already registered|already exists/i.test(m))setMsg('這個信箱已經註冊過了，直接登入或重設密碼');
+        else if(/rate|too many/i.test(m))setMsg('寄信太頻繁，等 1 分鐘再試');
+        else setMsg(m);
+        render();return;
+      }
+      window.__gvdLastEmail=email;
+      if(r.data&&r.data.session){afterLogin(r.data.session);return}
+      setMsg('驗證信已寄到 '+email,'ok');showGate('confirm');
+    }).catch(function(e){lock(false);setMsg('連線失敗：'+(e.message||''));render()});
+  }
+
+  function doResend(){
+    var email=window.__gvdLastEmail||val('gvdEmail');
+    if(!okEmail(email)){setMsg('請回上一頁重新填寫郵箱');render();return}
+    lock(true);setMsg('寄送中…','ok');render();
+    client().auth.resend({type:'signup',email:email,options:{emailRedirectTo:location.origin+location.pathname}}).then(function(r){
+      lock(false); setMsg(r.error?('寄送失敗：'+r.error.message):'已重新寄出，請看信箱（含垃圾郵件）', r.error?'err':'ok'); render();
+    }).catch(function(e){lock(false);setMsg('寄送失敗：'+e.message);render()});
+  }
+
+  function doForgot(){
+    var email=val('gvdEmail');
+    if(!okEmail(email)){setMsg('請填正確的郵箱');render();return}
+    lock(true);setMsg('寄送中…','ok');render();
+    client().auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname}).then(function(r){
+      lock(false);setMsg(r.error?('寄送失敗：'+r.error.message):'重設信已寄出，請看信箱',r.error?'err':'ok');render();
+    }).catch(function(e){lock(false);setMsg('寄送失敗：'+e.message);render()});
+  }
+
+  function saveNick(name){
+    var u=user();
+    if(!u)return Promise.resolve({ok:true});
+    return client().from('profiles').upsert({id:u.id,nickname:name}).then(function(r){
+      if(r.error){
+        if(r.error.code==='23505'||/duplicate|unique/i.test(r.error.message||''))return {ok:false,msg:'「'+name+'」已經有人用了，換一個吧'};
+        return {ok:true};
+      }
+      return {ok:true};
+    }).catch(function(){return {ok:true}});
+  }
+  function syncMetadata(name){
+    try{return client().auth.updateUser({data:{nickname:name}})}catch(e){return Promise.resolve(null)}
+  }
+  function doNick(){
+    if(busy)return;
+    var name=val('gvdNick');
+    if(name.length<2){setMsg('名字至少 2 個字');render();return}
+    if(name.length>16){setMsg('名字最多 16 個字');render();return}
+    lock(true);setMsg('儲存中…','ok');render();
+    saveNick(name).then(function(res){
+      if(!res.ok){lock(false);setMsg(res.msg);render();return}
+      client().auth.updateUser({data:{nickname:name}}).then(function(r){
+        lock(false);
+        if(r.error){setMsg('儲存失敗：'+r.error.message);render();return}
+        applyNick(name);hideGate();
+        try{localStorage.removeItem(LS_GUEST)}catch(e){}
+        if(typeof say==='function')say('歡迎，'+name+'！');
+      }).catch(function(e){lock(false);setMsg('儲存失敗：'+e.message);render()});
+    });
+  }
+
+  function applyNick(name){
+    try{
+      if(typeof localProfile!=='undefined'&&name){localProfile.name=name; if(typeof saveProfile==='function')saveProfile();}
+      var line=document.getElementById('profileLine');
+      if(line&&typeof localProfile!=='undefined')line.innerHTML=(localProfile.avatar||'🛡️')+' '+(localProfile.name||'')+'　'+tx('段位：青銅 III');
+      var nickInput=document.getElementById('nickName');
+      if(nickInput)nickInput.value=name;
+    }catch(e){}
+  }
+
+  function afterLogin(s){
+    if(!s){setMsg('登入失敗，請再試一次');render();return}
+    session=s;
+    try{localStorage.removeItem(LS_GUEST)}catch(e){}
+    if(!hasNick()){setMsg('');showGate('nick');return}
+    applyNick(nick());hideGate();
+    if(typeof say==='function')say('已登入：'+nick());
+  }
+
+  /* ---------- 啟動 ---------- */
+  function start(){
+    if(booted)return; booted=true;
+    if(el('gvdAccountInfo'))updateAccountInfo();
+    client().auth.getSession().then(function(r){
+      session=r&&r.data?r.data.session:null;
+      if(session){ if(!hasNick())showGate('nick'); else {applyNick(nick());} }
+      else if(!isGuest()) showGate('login');
+      updateAccountInfo();
+    }).catch(function(){ if(!isGuest())showGate('login'); });
+    client().auth.onAuthStateChange(function(ev,s){
+      if(ev==='SIGNED_IN'&&s){ session=s; if(!hasNick())showGate('nick'); else {applyNick(nick());hideGate();} updateAccountInfo(); }
+      if(ev==='SIGNED_OUT'){ session=null; updateAccountInfo(); }
+      if(ev==='USER_UPDATED'&&s){ session=s; updateAccountInfo(); }
+    });
+  }
+  function isGuest(){try{return localStorage.getItem(LS_GUEST)==='1'}catch(e){return false}}
+
+  /* ---------- 設置面板裡的「帳號」 ---------- */
+  function updateAccountInfo(){
+    var u=user();
+    var box=el('gvdAccountInfo');
+    if(box){
+      box.textContent = u ? ('已登入：'+(nick()||u.email)) : (isGuest()?'遊客模式（未登入）':'未登入');
+    }
+    var out=el('gvdLogoutBtn'); if(out)out.style.display=u?'block':'none';
+  }
+  function injectAccountRow(){
+    try{
+      var close=el('panelClose'); if(!close||!close.parentNode)return;
+      if(el('gvdAccountInfo')){updateAccountInfo();return}
+      var wrap=document.createElement('div');
+      wrap.style.cssText='margin:12px 0 4px;padding:10px;border:1px solid var(--line,#2a3a4a);border-radius:9px';
+      var t=document.createElement('p');
+      t.style.cssText='margin:0 0 8px;font-size:13px';
+      t.id='gvdAccountInfo';
+      var lo=document.createElement('button');
+      lo.id='gvdLogoutBtn'; lo.type='button'; lo.className='danger';
+      lo.textContent=tx('登出帳號');
+      lo.onclick=function(){
+        client().auth.signOut().then(function(){session=null;try{localStorage.removeItem(LS_GUEST)}catch(e){}
+          try{extraPanel.style.display='none'}catch(e){}
+          if(typeof say==='function')say('已登出');showGate('login');});
+      };
+      wrap.appendChild(t); wrap.appendChild(lo);
+      close.parentNode.insertBefore(wrap,close);
+      updateAccountInfo();
+    }catch(e){}
+  }
+
+  // 包住 openSettings，讓設置面板固定顯示帳號區塊
+  try{
+    if(typeof openSettings==='function'){
+      var _os=openSettings;
+      openSettings=function(){ _os.apply(null,arguments); setTimeout(injectAccountRow,0); };
+    }
+  }catch(e){}
+
+  function patchNickInput(){
+    var n=el('nickInput'); if(!n||n.__gvdNickPatch)return; n.__gvdNickPatch=1;
+    n.onchange=function(){
+      var name=(n.value||'').trim();
+      if(name.length<2){if(typeof say==='function')say('名字至少 2 個字');n.value=(typeof localProfile!=='undefined'&&localProfile.name)||'';return}
+      if(name.length>16){if(typeof say==='function')say('名字最多 16 個字');n.value=(typeof localProfile!=='undefined'&&localProfile.name)||'';return}
+      if(!user()){
+        if(typeof localProfile!=='undefined'){localProfile.name=name;if(typeof saveProfile==='function')saveProfile();}
+        applyNick(name);return;
+      }
+      saveNick(name).then(function(res){
+        if(!res.ok){if(typeof say==='function')say(res.msg);n.value=(typeof localProfile!=='undefined'&&localProfile.name)||'';return}
+        if(typeof localProfile!=='undefined'){localProfile.name=name;if(typeof saveProfile==='function')saveProfile();}
+        applyNick(name); syncMetadata(name);
+        if(typeof say==='function')say('名字已更新');
+      });
+    };
+  }
+  try{
+    if(typeof panel==='function'){
+      var _gvdPanel=panel;
+      panel=function(t,b){_gvdPanel(t,b); setTimeout(patchNickInput,0);};
+    }
+  }catch(e){}
+  // Supabase 程式載入後再啟動；載不到就不擋遊戲
+  if(typeof sbLoad==='function'){
+    sbLoad().then(function(){ start(); }).catch(function(){ bootFail=true; });
+  }else{ start(); }
+
+  window.__gvdAuth={view:function(){return view},isLoggedIn:function(){return !!session},nick:nick,gate:function(v){showGate(v||'login')},close:hideGate,saveNick:saveNick,user:user};
+})();
+
+</script>
 </body>
 </html>
