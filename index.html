@@ -1186,7 +1186,7 @@ document.addEventListener('change',e=>{
 
 // 主介面個人資料／頭像／好友／段位：本機保存，聯機需要伺服器版本
 const originalStart=document.getElementById('ob2').onclick;
-document.getElementById('ot').insertAdjacentHTML('afterend',`<p id="profileLine" style="text-align:center">${localProfile.avatar} ${localProfile.name}　段位：青銅 III</p><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap"><button id="profileBtn">個人資料</button><button id="friendsBtn">好友</button><button id="homeBtn">主頁</button><button id="eventBtn">活動</button><button id="msgBtn">消息</button><button id="rankBtn">段位排名</button><button id="matchBtn">匹配／房間</button><button id="friendDuelBtn">好友對決</button><button id="mailBtn">郵箱</button><button id="homeSettingsBtn">⚙ 設置</button></div>`);
+document.getElementById('ot').insertAdjacentHTML('afterend',`<p id="profileLine" style="text-align:center">${localProfile.avatar} ${localProfile.name}　段位：青銅 III</p><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap"><button id="profileBtn">個人資料</button><button id="friendsBtn">好友</button><button id="gvdNavBag">背包</button><button id="homeBtn">主頁</button><button id="eventBtn">活動</button><button id="msgBtn">消息</button><button id="rankBtn">段位排名</button><button id="matchBtn">匹配／房間</button><button id="friendDuelBtn">好友對決</button><button id="mailBtn">郵箱</button><button id="homeSettingsBtn">⚙ 設置</button></div>`);
 document.getElementById('homeSettingsBtn').onclick=openSettings;
 
 // 1.1.14 好友對決：同裝置雙人可直接開戰；跨裝置邀請明確提示需線上伺服器
@@ -3611,7 +3611,7 @@ window.gvdOpenSkins=function(){
   var price=p.currency==='gacha'?L('noDirect'):p.currency==='event'?eventLabel():p.amount+' '+(p.currency==='diamonds'?L('diamonds'):L('tickets'));
   h.push('<div class="gvdSkinItem"><div class="gvdSkinArt" style="background:linear-gradient(145deg,'+esc(s.glow)+',#10243c)">'+(s.splash?'<img src="'+s.splash+'" alt="">':'')+'</div><div class="gvdSkinInfo"><b>'+esc(tr(s.hero))+' · '+esc(tr(s.name))+'</b><small>'+esc(tierText(s.tier))+'</small><small>'+esc(price)+'</small><button type="button" data-gvd-buy="'+esc(s.id)+'">'+(has?L('equip'):p.currency==='gacha'?L('gacha'):p.currency==='event'?eventLabel():L('buy'))+'</button></div></div>');
  });
- h.push('</div><p><button type="button" id="gvdOpenGacha">'+L('gacha')+'</button> <button type="button" id="gvdOpenLevels">'+L('levelRewards')+'</button> <button type="button" id="gvdOpenEco">🌹 '+(lang()==='en'?'Roses · Shards':lang()==='zh-Hans'?'玫瑰・碎片商店':'玫瑰・碎片商店')+'</button></p>');
+ h.push('</div><p><button type="button" id="gvdOpenGacha">'+L('gacha')+'</button> <button type="button" id="gvdOpenLevels">'+L('levelRewards')+'</button> <button type="button" id="gvdOpenBag">🎒 '+(lang()==='en'?'Backpack':lang()==='zh-Hans'?'背包':'背包')+'</button> <button type="button" id="gvdOpenEco">🌹 '+(lang()==='en'?'Roses · Shards':lang()==='zh-Hans'?'玫瑰・碎片商店':'玫瑰・碎片商店')+'</button></p>');
  panel(L('shop'),h.join(''));
  var pn=document.getElementById('extraPanel');
  pn.querySelectorAll('[data-gvd-buy]').forEach(function(b){if(priceOf(window.SKIN_BY_ID[b.dataset.gvdBuy]).currency==='event'&&!skinOwned(b.dataset.gvdBuy)){b.disabled=true;return}b.onclick=function(){buySkin(b.dataset.gvdBuy);window.gvdOpenSkins()}});
@@ -6656,9 +6656,17 @@ window.GVD_PD={"hacker": {"img": "data:image/webp;base64,UklGRpxeAABXRUJQVlA4WAo
     var p=b64e({t:g.to,k:g.kind,v:g.val,s:g.skin||'',n:(g.note||'').slice(0,24),x:Date.now()+2592000000});
     return 'GVD-'+p+'-'+chk(p);
   }
+  /* 全服通用短碼表（新增一行即可再發一檔；t='*' 每位玩家限領一次） */
+  var SHORT_CODES={
+    'xgdjshangxian':{k:'bundle',t:'*',x:0,n:'上線福利',bundle:{points:500,diamond:200,gold:5000}},
+    'xgdj':{k:'bundle',t:'*',x:0,n:'新手禮包',bundle:{points:200,diamond:100,gold:5000}}
+    // 例：帶道具的碼 → 'xxx':{k:'bundle',t:'*',bundle:{points:100,bag:{trial7:1}}}
+  };
   function parseCode(code){
     var c=String(code||'').trim().replace(/\s/g,'');
-    if(c.indexOf('GVD-')!==0)return {err:'格式不對，兌換碼開頭要是 GVD-'};
+    var sc=SHORT_CODES[c.toLowerCase()];
+    if(sc)return {ok:{t:sc.t,k:sc.k,x:sc.x,n:sc.n,bundle:sc.bundle}};
+    if(c.indexOf('GVD-')!==0)return {err:'格式不對，兌換碼開頭要是 GVD- 或官方短碼'};
     var body=c.slice(4), i=body.lastIndexOf('-');
     if(i<0)return {err:'兌換碼不完整'};
     var p=body.slice(0,i), cc=body.slice(i+1).toUpperCase();
@@ -6671,7 +6679,19 @@ window.GVD_PD={"hacker": {"img": "data:image/webp;base64,UklGRpxeAABXRUJQVlA4WAo
   }
   function applyGrant(o){
     var p=prof();if(!p)return '本機存檔還沒載入，請先進入大廳再兌換';
+    if(o.k==='bundle'){
+      var b=o.bundle||{},got=[];
+      if(b.points){p.points=(Number(p.points)||0)+b.points;got.push('點券 +'+b.points)}
+      if(b.diamond){p.diamonds=(Number(p.diamonds)||0)+b.diamond;got.push('鑽石 +'+b.diamond)}
+      if(b.gold){p.gold=(Number(p.gold)||0)+b.gold;got.push('金幣 +'+b.gold)}
+      if(b.rose){p.roses=(Number(p.roses)||0)+b.rose;got.push('親密玫瑰 +'+b.rose)}
+      if(b.shards){p.shards=(Number(p.shards)||0)+b.shards;got.push('碎片 +'+b.shards)}
+      if(b.bag&&typeof b.bag==='object'){if(!p.bag||typeof p.bag!=='object')p.bag={};for(var bi in b.bag){p.bag[bi]=(Number(p.bag[bi])||0)+Number(b.bag[bi]||0);got.push('道具 '+bi+' ×'+b.bag[bi])}}
+      if(b.skin){var ow={};try{ow=JSON.parse(localStorage.getItem('gvd_skins')||'{}')}catch(e){};ow[b.skin]=true;jset('gvd_skins',ow);var nm=(window.SKIN_BY_ID&&window.SKIN_BY_ID[b.skin]&&window.SKIN_BY_ID[b.skin].name)||b.skin;got.push('皮膚：'+nm)}
+      save();return got.join('、')||'（空禮包）';
+    }
     if(o.k==='points'){p.points=(Number(p.points)||0)+(Number(o.v)||0);save();return '點券 +'+(Number(o.v)||0)}
+    if(o.k==='gold'){p.gold=(Number(p.gold)||0)+(Number(o.v)||0);save();return '金幣 +'+(Number(o.v)||0)}
     if(o.k==='diamond'){p.diamonds=(Number(p.diamonds)||0)+(Number(o.v)||0);save();return '鑽石 +'+(Number(o.v)||0)}
     if(o.k==='skin'){
       var own={};try{own=JSON.parse(localStorage.getItem('gvd_skins')||'{}')}catch(e){}
@@ -6796,7 +6816,7 @@ window.GVD_PD={"hacker": {"img": "data:image/webp;base64,UklGRpxeAABXRUJQVlA4WAo
     m.innerHTML='<div style="width:100%;max-width:400px;background:#0f1a26;border:1px solid #2a3a4a;border-radius:14px;padding:16px;color:#dbe6f2;font-family:system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif">'
       +'<h2 style="margin:0 0 6px;font-size:17px;color:#fff">輸入兌換碼</h2>'
       +'<p style="margin:0 0 10px;font-size:12px;color:#8ba6c0">官方發的兌換碼貼在這裡，內容會直接到這個帳號。</p>'
-      +'<input id="gvdCodeIn" placeholder="GVD-…" style="width:100%;box-sizing:border-box;padding:11px;border-radius:9px;border:1px solid #2f4257;background:#0b141d;color:#e7f0fa;font-size:13px;word-break:break-all">'
+      +'<input id="gvdCodeIn" placeholder="GVD-… 或官方短碼（例：xgdjshangxian）" style="width:100%;box-sizing:border-box;padding:11px;border-radius:9px;border:1px solid #2f4257;background:#0b141d;color:#e7f0fa;font-size:13px;word-break:break-all">'
       +'<p id="gvdCodeMsg" style="margin:10px 0 0;font-size:12px;min-height:16px;color:#ffcf8a"></p>'
       +'<div style="display:flex;gap:8px;margin-top:12px">'
       +'<button id="gvdCodeOK" style="flex:1;padding:11px;border-radius:9px;border:1px solid #3f7fbf;background:#1d4f80;color:#eaf3fb;font-size:14px">兌換</button>'
@@ -7128,6 +7148,8 @@ function ensure(){
   if(!isFinite(Number(p.roseAff)))p.roseAff=0;
   if(!p.aff||typeof p.aff!=='object')p.aff={};
   if(!isFinite(Number(p.gachaRewardPaid)))p.gachaRewardPaid=0;
+  if(!p.rel||typeof p.rel!=='object')p.rel={};
+  if(!isFinite(Number(p.gachaDia))){var __t=0;try{__t=num((JSON.parse(localStorage.getItem('gvd_doria_gacha')||'{}')).total)}catch(e){}p.gachaDia=Math.min(num(p.diamonds),gachaDiaTotal(__t));}
   if(!p.heroes||typeof p.heroes!=='object')p.heroes={angela:true,wukong:true,lixin:true,luban:true,doria:true};
   p.gold=num(p.gold);p.roses=num(p.roses);p.shards=num(p.shards);p.roseAff=num(p.roseAff);p.gachaRewardPaid=num(p.gachaRewardPaid);
   return p;
@@ -7135,19 +7157,32 @@ function ensure(){
 ensure();
 
 /* ---------- 抽獎獎勵表（以抽數為種子，保證歷史補發與新抽一致、可重算） ---------- */
+var DROP_ITEMS=[
+ {id:'trial7',nm:['豪華皮膚暢玩卡・7天','豪华皮肤畅玩卡・7天','Skin Trial Card · 7d']},
+ {id:'goldpack',nm:['金幣紅包（小）','金币红包（小）','Gold Pack (S)']},
+ {id:'box1',nm:['勇者寶箱','勇者宝箱','Brave Chest']},
+ {id:'horn',nm:['全服喇叭','全服喇叭','Server Horn']}
+];
 function rollOf(i){
   var h=(i*2654435761)>>>0;h=(h^(h>>>15))>>>0;h=(h*2246822507)>>>0;h=(h^(h>>>13))>>>0;
   var r=h%1000,q=((h>>>11)%1000)/1000;
-  if(r<560)return{k:'gold',n:200+Math.floor(q*701),nm:L3('金幣','金币','Gold')};
-  if(r<850)return{k:'dia',n:2+Math.floor(q*9),nm:L3('鑽石','钻石','Diamonds')};
-  return{k:'rose',n:1+Math.floor(q*3),nm:L3('親密玫瑰','亲密玫瑰','Rose')};
+  if(r<540)return{k:'gold',n:200+Math.floor(q*701),nm:L3('金幣','金币','Gold')};
+  if(r<800)return{k:'dia',n:2+Math.floor(q*9),nm:L3('鑽石','钻石','Diamonds')};
+  if(r<940)return{k:'rose',n:1+Math.floor(q*3),nm:L3('親密玫瑰','亲密玫瑰','Rose')};
+  var lst=(typeof DROP_ITEMS!=='undefined'&&DROP_ITEMS&&DROP_ITEMS.length)?DROP_ITEMS:[{id:'goldpack',nm:['金幣紅包（小）','金币红包（小）','Gold Pack (S)']}];
+  var it=lst[(h>>>17)%lst.length];
+  return{k:'item',id:it.id,n:1,nm:L3(it.nm[0],it.nm[1],it.nm[2])};
 }
+function gachaDiaTotal(total){var s=0;for(var i=1;i<=total;i++){var r=rollOf(i);if(r.k==='dia')s+=r.n}return s}
+var RELS=[['兄弟','兄弟','Brothers'],['姐妹','姐妹','Sisters'],['姐弟','姐弟','Sis & Bro'],['哥妹','哥妹','Bro & Sis'],['基友','基友','Besties'],['CP','CP','Couple (CP)'],['戀人','恋人','Lover']];
+function relName(t){for(var i=0;i<RELS.length;i++)if(RELS[i][0]===t)return L3(RELS[i][0],RELS[i][1],RELS[i][2]);return t}
 function grant(r,times){
   var p=ensure();if(!p)return;
   times=Math.max(1,times||1);
   if(r.k==='gold')p.gold+=r.n*times;
   else if(r.k==='dia')p.diamonds=num(p.diamonds)+r.n*times;
   else if(r.k==='rose'){p.roses+=r.n*times;p.roseAff+=r.n*times;}
+  else if(r.k==='item'){if(!p.bag||typeof p.bag!=='object')p.bag={};p.bag[r.id]=(num(p.bag[r.id])||0)+r.n*times;}
 }
 window.gvdPullReward=function(i){return rollOf(i)};
 
@@ -7158,17 +7193,29 @@ window.gvdGachaBackfill=function(opt){
   try{d=typeof gachaData==='function'?gachaData():JSON.parse(localStorage.getItem('gvd_doria_gacha')||'{"total":0}')}catch(e){}
   var total=num(d.total),paid=num(p.gachaRewardPaid);
   if(total<paid)paid=total;
-  var out=[],g=0,dia=0,rose=0,aff=0;
+  var out=[],g=0,dia=0,rose=0,aff=0,gd=0,items={};
   for(var i=paid+1;i<=total;i++){var r=rollOf(i);out.push(r);
-    if(r.k==='gold')g+=r.n;else if(r.k==='dia')dia+=r.n;else{rose+=r.n;aff+=r.n}}
+    if(r.k==='gold')g+=r.n;else if(r.k==='dia'){dia+=r.n;gd+=r.n}else if(r.k==='item'){}else{rose+=r.n;aff+=r.n}}
   if(out.length){
-    p.gold+=g;p.diamonds=num(p.diamonds)+dia;p.roses+=rose;p.roseAff+=aff;p.gachaRewardPaid=total;saveP();
+    p.gold+=g;p.diamonds=num(p.diamonds)+dia;p.gachaDia=num(p.gachaDia)+gd;p.roses+=rose;p.roseAff+=aff;
+    p.gachaRewardPaid=total;
   }
-  if(!opt.silent&&out.length&&typeof say==='function'){
+  /* 道具單獨補發（含歷史，不受貨幣計數影響） */
+  var ipaid=num(p.gachaItemPaid),icnt={},itot=0;
+  if(ipaid<total){
+    if(!p.bag||typeof p.bag!=='object')p.bag={};
+    for(var j=ipaid+1;j<=total;j++){var rr=rollOf(j);if(rr.k==='item'){icnt[rr.id]=(icnt[rr.id]||0)+1;itot++}}
+    for(var kk2 in icnt){p.bag[kk2]=(num(p.bag[kk2])||0)+icnt[kk2]}
+    p.gachaItemPaid=total;saveP();
+  }
+  if(out.length||itot)saveP();
+  if(!opt.silent&&(out.length||itot)&&typeof say==='function'){
     var parts=[];if(g)parts.push(L3('金幣 +','金币 +','Gold +')+g);
     if(dia)parts.push(L3('鑽石 +','钻石 +','Diamonds +')+dia);
     if(rose)parts.push(L3('親密玫瑰 +','亲密玫瑰 +','Rose +')+rose);
-    say(L3('已補發 '+out.length+' 抽的奪寶獎勵：','已补发 '+out.length+' 抽的夺宝奖励：','Backfilled rewards for '+out.length+' pulls: ')+parts.join('，'));
+    if(itot){for(var k3 in icnt){var inm=k3;for(var di=0;di<DROP_ITEMS.length;di++){if(DROP_ITEMS[di].id===k3){inm=L3(DROP_ITEMS[di].nm[0],DROP_ITEMS[di].nm[1],DROP_ITEMS[di].nm[2])}}parts.push(inm+' ×'+icnt[k3])}}
+    if(!parts.length)parts.push(L3('無新增獎勵','无新增奖励','nothing new'));
+    say((out.length?L3('已補發 '+out.length+' 抽的奪寶獎勵：','已补发 '+out.length+' 抽的夺宝奖励：','Backfilled rewards for '+out.length+' pulls: '):L3('奪寶道具已補進背包：','夺宝道具已补进背包：','Gacha items added to bag: '))+parts.join('，'));
   }
   return out;
 };
@@ -7207,20 +7254,38 @@ function walletHTML(){
 function exHTML(){
   var p=ensure();
   return '<h3>'+L3('玫瑰・貨幣兌換碎片','玫瑰・货币兑换碎片','Rose & currency → shards')+'</h3>'+
-  '<p style="font-size:12px;opacity:.8">'+L3('兌換率：1 親密玫瑰＝5 碎片　1 鑽石＝10 碎片　100 金幣＝10 碎片','兑换率：1 亲密玫瑰＝5 碎片　1 钻石＝10 碎片　100 金币＝10 碎片','Rates: 1 Rose = 5 shards · 1 Diamond = 10 shards · 100 Gold = 10 shards')+'</p>'+
+  '<p style="font-size:12px;opacity:.8">'+L3('兌換率：1 親密玫瑰＝5 碎片　1 奪寶鑽石＝10 碎片　100 金幣＝10 碎片','兑换率：1 亲密玫瑰＝5 碎片　1 夺宝钻石＝10 碎片　100 金币＝10 碎片','Rates: 1 Rose = 5 shards · 1 Gacha Diamond = 10 shards · 100 Gold = 10 shards')+'</p>'+
   '<div class="gvdExRow"><span>🌹 '+num(p.roses)+'</span><button data-ex="rose1">'+L3('兌 1 朵（+5）','兑 1 朵（+5）','Exchange 1 (+5)')+'</button><button data-ex="roseAll">'+L3('全部兌換','全部兑换','Exchange all')+'</button></div>'+
-  '<div class="gvdExRow"><span>💎 '+num(p.diamonds)+'</span><button data-ex="dia1">'+L3('兌 1 顆（+10）','兑 1 颗（+10）','Exchange 1 (+10)')+'</button><button data-ex="dia10">'+L3('兌 10 顆（+100）','兑 10 颗（+100）','Exchange 10 (+100)')+'</button></div>'+
+  '<div class="gvdExRow"><span>💎 '+L3('奪寶鑽石','夺宝钻石','Gacha D.')+' '+num(p.gachaDia)+' / '+num(p.diamonds)+'</span><button data-ex="dia1">'+L3('兌 1 顆（+10）','兑 1 颗（+10）','Exchange 1 (+10)')+'</button><button data-ex="dia10">'+L3('兌 10 顆（+100）','兑 10 颗（+100）','Exchange 10 (+100)')+'</button></div>'+
+  '<p style="font-size:11px;opacity:.7;margin:-2px 0 8px">'+L3('※ 只有「無雙限定奪寶」抽到的鑽石能換碎片，其他管道取得的鑽石不可兌換。','※ 只有「无双限定夺宝」抽到的钻石能换碎片，其他渠道取得的钻石不可兑换。','Only diamonds won from the Doria gacha can be converted.')+'</p>'+
   '<div class="gvdExRow"><span>🪙 '+num(p.gold)+'</span><button data-ex="gold100">'+L3('兌 100 金幣（+10）','兑 100 金币（+10）','Exchange 100 gold (+10)')+'</button><button data-ex="goldAll">'+L3('全部金幣','全部金币','All gold')+'</button></div>';
 }
 function skinHTML(){
   var own=ownSkins(),p=ensure();
-  return '<h3>'+L3('碎片／鑽石兌換皮膚','碎片／钻石兑换皮肤','Skins · pay with shards or diamonds')+'</h3>'+
+  return '<h3>'+L3('碎片兌換皮膚','碎片兑换皮肤','Skins · shards only')+'</h3>'+
   SKIN_SHOP.map(function(s){
     var has=!!own[s.id];
-    return '<div class="gvdShopRow"><div class="gvdShopInfo"><b>'+esc2(s.hero)+' · '+esc2(s.name)+'</b><small>'+esc2(s.note)+' ｜ 🧩 '+s.shards+'　💎 '+s.dia+'</small></div>'+
+    return '<div class="gvdShopRow"><div class="gvdShopInfo"><b>'+esc2(s.hero)+' · '+esc2(s.name)+'</b><small>'+esc2(s.note)+' ｜ 🧩 '+s.shards+'</small></div>'+
       (has?'<button disabled>'+L3('已擁有','已拥有','Owned')+'</button>':
-      '<button data-skin="'+s.id+'">🧩 '+L3('兌換','兑换','Unlock')+'</button><button data-skindia="'+s.id+'">💎 '+L3('直購','直购','Buy')+'</button>')+'</div>';
-  }).join('')+'<p style="font-size:11px;opacity:.7">'+L3('碎片不足時可先到上方把玫瑰／鑽石／金幣換成碎片。','碎片不足时可先到上方把玫瑰／钻石／金币换成碎片。','Convert roses, diamonds or gold above if you lack shards.')+'</p>';
+      '<button data-skin="'+s.id+'">🧩 '+L3('兌換','兑换','Unlock')+'</button>')+'</div>';
+  }).join('')+'<p style="font-size:11px;opacity:.7">'+L3('無雙限定奪寶皮膚僅接受碎片兌換，面板內不提供任何直購。','无双限定夺宝皮肤仅接受碎片兑换，面板内不提供任何直购。','Mythic gacha skins are shard-only; no direct purchase in this panel.')+'</p>';
+}
+function friendsHTML(){
+  var p=ensure(),fs=(p.friends||[]);
+  var head='<h3>'+L3('親密系統','亲密系统','Intimacy system')+'</h3>';
+  if(!fs.length)return head+'<p style="font-size:12px;opacity:.75">'+L3('好友清單是空的，先到「好友」新增暱稱。','好友清单是空的，先到「好友」新增昵称。','Friend list is empty — add a nickname in Friends first.')+'</p>';
+  return head+'<p style="font-size:11px;opacity:.7">'+L3('送 1 朵玫瑰＝好友好感度 +5；好感度滿 100 可建立關係（戀人全服僅能一位）。','送 1 朵玫瑰＝好友好感度 +5；好感度满 100 可建立关系（恋人全服仅能一位）。','1 Rose = +5 affection; at 100 you can set a relationship (only one Lover).')+'</p>'+
+  fs.map(function(f,i){
+    var fn=(f&&typeof f==='object')?(f.name||f.nick||f.title||JSON.stringify(f)):String(f);
+    var a=num(p.aff[fn]),r=p.rel[fn];
+    var bar='<div class="gvdAffBar"><i style="width:'+Math.min(100,(a/100)*100)+'%"></i></div>';
+    var right='<button data-rose="'+i+'">🌹 '+L3('贈送','赠送','Send')+'</button>';
+    if(!r&&a>=100){right+='<button data-relopen="'+i+'">'+L3('建立關係','建立关系','Set relation')+'</button>'}
+    var mid=r?'<small class="gvdRelLine"><span>❤️ '+a+'</span><b class="gvdRelTag">'+esc2(relName(r.t))+'</b><button class="gvdMini" data-reldel="'+i+'">'+L3('解除','解除','End')+'</button></small>':'<small class="gvdRelLine"><span>❤️ '+a+' / 100</span></small>';
+    return '<div class="gvdShopRow"><div class="gvdShopInfo" style="flex:1"><b>'+esc2(fn)+'</b>'+bar+mid+'</div>'+right+'</div>';
+  }).join('')+
+  '<div id="gvdRelPick" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:rgba(255,255,255,.06)"><b style="font-size:12px">'+L3('選擇關係','选择关系','Choose relation')+'</b><div class="gvdRelBtns">'+
+  RELS.map(function(r,i2){return '<button data-relset="'+i2+'">'+esc2(relName(r[0]))+'</button>'}).join('')+'</div></div>';
 }
 function heroHTML(){
   var p=ensure();
@@ -7230,16 +7295,6 @@ function heroHTML(){
     return '<div class="gvdShopRow"><div class="gvdShopInfo"><b>'+esc2(h.name)+'</b><small>🪙 '+h.gold+'</small></div>'+
     (has?'<button disabled>'+L3('已擁有','已拥有','Owned')+'</button>':'<button data-hero="'+h.id+'">'+L3('購買','购买','Buy')+'</button>')+'</div>';
   }).join('')+'<p style="font-size:11px;opacity:.7">'+L3('目前 5 位英雄皆已解鎖，金幣商店保留給後續新增英雄。','目前 5 位英雄皆已解锁，金币商店保留给后续新增英雄。','All 5 heroes are unlocked; this shop is ready for future heroes.')+'</p>';
-}
-function friendsHTML(){
-  var p=ensure(),fs=(p.friends||[]);
-  if(!fs.length)return '<h3>'+L3('贈送親密玫瑰（好友好感度 +5）','赠送亲密玫瑰（好友好感度 +5）','Gift a Rose (+5 friend affection)')+'</h3><p style="font-size:12px;opacity:.75">'+L3('好友清單是空的，先到「好友」新增暱稱。','好友清单是空的，先到「好友」新增昵称。','Friend list is empty — add a nickname in Friends first.')+'</p>';
-  return '<h3>'+L3('贈送親密玫瑰（好友好感度 +5）','赠送亲密玫瑰（好友好感度 +5）','Gift a Rose (+5 friend affection)')+'</h3>'+
-  fs.map(function(f,i){
-    var fn=(f&&typeof f==='object')?(f.name||f.nick||f.title||JSON.stringify(f)):String(f);
-    var a=num(p.aff[fn]);
-    return '<div class="gvdShopRow"><div class="gvdShopInfo"><b>'+esc2(fn)+'</b><small>❤️ '+L3('好感度','好感度','Affection')+' '+a+'</small></div><button data-rose="'+i+'">🌹 '+L3('贈送','赠送','Send')+'</button></div>';
-  }).join('');
 }
 function render(){
   var p=ensure();if(!p)return;
@@ -7253,15 +7308,41 @@ window.gvdOpenEco=function(){
   if(typeof panel==='function')panel(title,h);
   var body=document.getElementById('gvdEcoBody');if(!body)return;
   render();
+  var relPick=-1;
   body.addEventListener('click',function(e){
     var b=e.target.closest('button');if(!b)return;
     var p2=ensure();
+    var nameOf=function(x){return (x&&typeof x==='object')?(x.name||x.nick||x.title||JSON.stringify(x)):String(x)};
+    if(b.dataset.relopen){
+      var ii=+b.dataset.relopen,f1=nameOf(p2.friends[ii]);
+      if(num(p2.aff[f1])<100){typeof say==='function'&&say(L3('好感度還沒到 100','好感度还没到 100','Affection is below 100'));return}
+      relPick=ii;var pk=document.getElementById('gvdRelPick');if(pk){pk.style.display='block';pk.scrollIntoView({block:'nearest'})}
+      return;
+    }
+    if(b.dataset.relset){
+      var rj=+b.dataset.relset,rt=RELS[rj][0];
+      if(relPick<0||!p2.friends[relPick])return;
+      var f2=nameOf(p2.friends[relPick]);
+      if(num(p2.aff[f2])<100){typeof say==='function'&&say(L3('好感度還沒到 100','好感度还没到 100','Affection is below 100'));return}
+      if(rt==='戀人'){
+        var other='';for(var q in p2.rel){if(q!==f2&&p2.rel[q]&&p2.rel[q].t==='戀人')other=q}
+        if(other){typeof say==='function'&&say(L3('你已經和「'+other+'」是戀人了（戀人只能一位）','你已经和「'+other+'」是恋人了（恋人只能一位）','You already have a Lover: '+other));return}
+      }
+      p2.rel[f2]={t:rt,at:Date.now()};saveP();render();
+      typeof say==='function'&&say(L3('已與「'+f2+'」建立'+relName(rt)+'關係','已与「'+f2+'」建立'+relName(rt)+'关系','Now '+relName(rt)+' with '+f2));
+      relPick=-1;return;
+    }
+    if(b.dataset.reldel){
+      var f3=nameOf(p2.friends[+b.dataset.reldel]);delete p2.rel[f3];saveP();render();
+      typeof say==='function'&&say(L3('已解除與「'+f3+'」的關係','已解除与「'+f3+'」的关系','Relation with '+f3+' ended'));
+      return;
+    }
     if(b.dataset.ex){
       var k=b.dataset.ex,msg='';
       if(k==='rose1'&&p2.roses>=1){p2.roses-=1;p2.shards+=5;msg=+5}
       else if(k==='roseAll'&&p2.roses>0){var r=p2.roses;p2.shards+=r*5;p2.roses=0;msg=r*5}
-      else if(k==='dia1'&&num(p2.diamonds)>=1){p2.diamonds=num(p2.diamonds)-1;p2.shards+=10;msg=10}
-      else if(k==='dia10'&&num(p2.diamonds)>=10){p2.diamonds=num(p2.diamonds)-10;p2.shards+=100;msg=100}
+      else if(k==='dia1'&&num(p2.gachaDia)>=1){p2.gachaDia-=1;p2.diamonds=num(p2.diamonds)-1;p2.shards+=10;msg=10}
+      else if(k==='dia10'&&num(p2.gachaDia)>=10){p2.gachaDia-=10;p2.diamonds=num(p2.diamonds)-10;p2.shards+=100;msg=100}
       else if(k==='gold100'&&p2.gold>=100){p2.gold-=100;p2.shards+=10;msg=10}
       else if(k==='goldAll'&&p2.gold>=100){var g=Math.floor(p2.gold/100)*100;var add=g/10;p2.gold-=g;p2.shards+=add;msg=add}
       if(msg){saveP();render();typeof say==='function'&&say(L3('兌換成功，碎片 +','兑换成功，碎片 +','Exchanged! Shards +')+msg)}
@@ -7276,10 +7357,7 @@ window.gvdOpenEco=function(){
       return;
     }
     if(b.dataset.skindia){
-      var s2=SKIN_SHOP.find(function(x){return x.id===b.dataset.skindia});if(!s2)return;
-      if(num(p2.diamonds)<s2.dia){typeof say==='function'&&say(L3('鑽石不足，還差 ','钻石不足，还差 ','Not enough diamonds: ')+(s2.dia-num(p2.diamonds)));return}
-      p2.diamonds=num(p2.diamonds)-s2.dia;var o2=ownSkins();o2[s2.id]=true;writeSkins(o2);p2.skinOn=s2.id;saveP();render();
-      typeof say==='function'&&say(s2.name+L3(' 已直購並裝備',' 已直购并装备',' purchased and equipped'));
+      typeof say==='function'&&say(L3('這款皮膚不提供直購，只能用碎片兌換','这款皮肤不提供直购，只能用碎片兑换','No direct purchase — shards only'));
       return;
     }
     if(b.dataset.hero){
@@ -7302,7 +7380,7 @@ window.gvdOpenEco=function(){
 /* ---------- 樣式 ---------- */
 try{
  var st=document.createElement('style');
- st.textContent='.gvdWallet{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}.gvdWal{flex:1 1 84px;min-width:84px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:6px 8px;text-align:center}.gvdWal b{display:block;font-size:15px;color:#ffd479}.gvdWal i{display:block;font-size:10px;opacity:.75;font-style:normal}.gvdExRow{display:flex;align-items:center;gap:6px;margin:6px 0;flex-wrap:wrap}.gvdExRow span{min-width:96px;font-size:12px}.gvdShopRow{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.09)}.gvdShopInfo b{display:block;font-size:13px}.gvdShopInfo small{font-size:10px;opacity:.75}.gvdRwTag{color:#ffd479;font-size:11px}';
+ st.textContent='.gvdWallet{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}.gvdWal{flex:1 1 84px;min-width:84px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:6px 8px;text-align:center}.gvdWal b{display:block;font-size:15px;color:#ffd479}.gvdWal i{display:block;font-size:10px;opacity:.75;font-style:normal}.gvdExRow{display:flex;align-items:center;gap:6px;margin:6px 0;flex-wrap:wrap}.gvdExRow span{min-width:96px;font-size:12px}.gvdShopRow{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.09)}.gvdShopInfo b{display:block;font-size:13px}.gvdShopInfo small{font-size:10px;opacity:.75}.gvdRwTag{color:#ffd479;font-size:11px}.gvdAffBar{height:6px;border-radius:99px;background:rgba(255,255,255,.14);margin:4px 0;overflow:hidden}.gvdAffBar i{display:block;height:100%;background:linear-gradient(90deg,#ff8fb1,#ffd479)}.gvdRelTag{color:#ffb0c6}.gvdRelLine{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px}.gvdRelLine .gvdRelTag{font-size:12px}.gvdMini{padding:3px 8px;font-size:11px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.07);color:#dfe}.gvdRelBtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.gvdRelBtns button{padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#eef;font-size:12px}';
  document.head.appendChild(st);
 }catch(e){}
 
@@ -7382,6 +7460,243 @@ function boot(){
   document.addEventListener('mousedown',once,true);
 }
 if(document.readyState!=='loading')setTimeout(boot,300);else document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,300)});
+})();
+</script>
+<script id="gvd-bag">
+/* ===== 1.4.7 增量：背包系統（參照王者榮耀風格：左分類／中格狀／右詳情） ===== */
+(function(){
+'use strict';
+if(window.__gvdBag)return;window.__gvdBag=1;
+function L3(a,b,c){var l='zh-Hant';try{l=(typeof currentLanguage==='function'?currentLanguage():((JSON.parse(localStorage.getItem('gvd_profile')||'{}').lang)||'zh-Hant'))}catch(e){}return l==='en'?c:(l==='zh-Hans'?b:a)}
+function esc2(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function num(v){v=Number(v);return isFinite(v)?Math.floor(v):0}
+function P(){return (typeof localProfile!=='undefined'&&localProfile)?localProfile:null}
+function saveP(){try{typeof saveProfile==='function'&&saveProfile()}catch(e){}}
+function say2(s){try{typeof say==='function'&&say(s)}catch(e){}}
+
+var CATS=[['all','全部','全部','All'],['item','道具','道具','Items'],['trial','體驗卡','体验卡','Trial cards'],['box','寶箱','宝箱','Chests'],['limit','限時道具','限时道具','Limited'],['cur','貨幣','货币','Currency']];
+
+var ITEMS=[
+ {id:'rose',cat:'item',ico:'🌹',c1:'#ff8fb1',name:['親密玫瑰','亲密玫瑰','Intimate Rose'],
+  desc:['贈送好友可 +5 好感度；也可兌 5 碎片。','赠送好友可 +5 好感度；也可兑 5 碎片。','Gift to a friend for +5 affection, or convert to 5 shards.'],
+  use:function(p){say2(L3('已為你打開親密系統','已为你打开亲密系统','Opening the intimacy panel'));window.gvdOpenEco&&window.gvdOpenEco()},cnt:function(p){return num(p.roses)}},
+ {id:'shard',cat:'item',ico:'🧩',c1:'#7fe0a0',name:['皮膚碎片','皮肤碎片','Skin Shards'],
+  desc:['兌換皮膚用。9980 可換無雙限定深海帝后。','兑换皮肤用。9980 可换无双限定深海帝后。','Used to unlock skins; 9980 for the Mythic deep-sea skin.'],
+  use:function(p){window.gvdOpenEco&&window.gvdOpenEco()},cnt:function(p){return num(p.shards)}},
+ {id:'trial7',cat:'trial',ico:'🎫',c1:'#ffd479',name:['豪華皮膚暢玩卡・7天','豪华皮肤畅玩卡・7天','Skin Trial Card · 7d'],
+  desc:['可免費體驗一款未擁有皮膚 7 天，每張限一款。','可免费体验一款未拥有皮肤 7 天，每张限一款。','Try one unowned skin for 7 days.'],
+  use:function(p){openTrialPicker()}},
+ {id:'goldpack',cat:'item',ico:'🎁',c1:'#ffcf6a',name:['金幣紅包（小）','金币红包（小）','Gold Pack (S)'],
+  desc:['開啟後獲得 500 金幣。','开启后获得 500 金币。','Open to receive 500 gold.'],
+  use:function(p){p.gold=num(p.gold)+500;saveP();say2(L3('金幣 +500','金币 +500','Gold +500'))}},
+ {id:'horn',cat:'item',ico:'📣',c1:'#8fc6ff',name:['全服喇叭','全服喇叭','Server Horn'],
+  desc:['用於對局外喊話（離線版僅本機可見）。','用于对局外喊话（离线版仅本机可见）。','Broadcast a message (local only in offline build).'],
+  use:function(p){say2(L3('你喊了一句：峽谷對決上線啦！','你喊了一句：峡谷对决上线啦！','You shouted: Canyon Duel is live!'))}},
+ {id:'box1',cat:'box',ico:'📦',c1:'#c9a3ff',name:['勇者寶箱','勇者宝箱','Brave Chest'],
+  desc:['隨機開出金幣／鑽石／親密玫瑰。','随机开出金币／钻石／亲密玫瑰。','Randomly yields gold, diamonds or roses.'],
+  use:function(p){var r=Math.random();if(r<.55){var g=200+Math.floor(Math.random()*601);p.gold=num(p.gold)+g;say2(L3('寶箱開出金幣 +'+g,'宝箱开出金币 +'+g,'Chest: Gold +'+g))}else if(r<.85){var d=5+Math.floor(Math.random()*11);p.diamonds=num(p.diamonds)+d;say2(L3('寶箱開出鑽石 +'+d,'宝箱开出钻石 +'+d,'Chest: Diamonds +'+d))}else{var rr=1+Math.floor(Math.random()*2);p.roses=num(p.roses)+rr;p.roseAff=num(p.roseAff)+rr;say2(L3('寶箱開出親密玫瑰 +'+rr,'宝箱开出亲密玫瑰 +'+rr,'Chest: Rose +'+rr))}saveP()}},
+ {id:'exp2',cat:'trial',ico:'📘',c1:'#7cc3ff',name:['雙倍經驗卡','双倍经验卡','2× EXP Card'],
+  desc:['下一局經驗翻倍（本版暫存於背包）。','下一局经验翻倍（本版暂存于背包）。','Double EXP for one match (stored).'],
+  use:function(p){say2(L3('已啟用：下一局經驗 ×2（本機記錄）','已启用：下一局经验 ×2（本机记录）','Activated: next match 2× EXP'))}}
+];
+
+var CUR=[
+ {id:'gold',ico:'🪙',name:['金幣','金币','Gold'],get:function(p){return num(p.gold)},go:function(){window.gvdOpenEco&&window.gvdOpenEco()}},
+ {id:'dia',ico:'💎',name:['鑽石','钻石','Diamonds'],get:function(p){return num(p.diamonds)},go:function(){window.gvdOpenEco&&window.gvdOpenEco()}},
+ {id:'gd',ico:'🔷',name:['奪寶鑽石','夺宝钻石','Gacha Diamonds'],get:function(p){return num(p.gachaDia)},go:function(){window.gvdOpenGacha&&window.gvdOpenGacha()}},
+ {id:'ticket',ico:'🎟',name:['點券','点券','Tickets'],get:function(p){return num(p.points)},go:function(){window.gvdOpenGacha&&window.gvdOpenGacha()}},
+ {id:'shard',ico:'🧩',name:['皮膚碎片','皮肤碎片','Skin Shards'],get:function(p){return num(p.shards)},go:function(){window.gvdOpenEco&&window.gvdOpenEco()}},
+ {id:'rose',ico:'🌹',name:['親密玫瑰','亲密玫瑰','Roses'],get:function(p){return num(p.roses)},go:function(){window.gvdOpenEco&&window.gvdOpenEco()}},
+ {id:'aff',ico:'❤️',name:['好感度','好感度','Affection'],get:function(p){return num(p.roseAff)},go:function(){window.gvdOpenEco&&window.gvdOpenEco()}}
+];
+
+function ensureBag(){
+  var p=P();if(!p)return null;
+  if(!p.bag||typeof p.bag!=='object')p.bag={};
+  if(!p.bagSeed){p.bag.trial7=(num(p.bag.trial7)||0)+2;p.bag.goldpack=(num(p.bag.goldpack)||0)+2;p.bag.box1=(num(p.bag.box1)||0)+1;p.bag.exp2=(num(p.bag.exp2)||0)+1;p.bag.horn=(num(p.bag.horn)||0)+3;p.bagSeed=1;saveP()}
+  return p;
+}
+function cntOf(p,it){return it.cnt?it.cnt(p):num(p.bag[it.id])}
+function consume(p,it){
+  if(it.cnt)return true;
+  if(num(p.bag[it.id])<1)return false;
+  p.bag[it.id]=num(p.bag[it.id])-1;saveP();return true;
+}
+
+var state={cat:'all',sel:null};
+function curBar(p){
+  return '<div class="gvdBagBar">'+
+   '<div class="gvdBagCur">🪙 <b>'+num(p.gold)+'</b></div>'+
+   '<div class="gvdBagCur">💎 <b>'+num(p.diamonds)+'</b></div>'+
+   '<div class="gvdBagCur">🔷 <b>'+num(p.gachaDia)+'</b></div>'+
+   '<div class="gvdBagCur">🎟 <b>'+num(p.points)+'</b></div>'+
+   '<div class="gvdBagCur">🧩 <b>'+num(p.shards)+'</b></div>'+
+   '<div class="gvdBagCur">🌹 <b>'+num(p.roses)+'</b></div>'+
+  '</div>';
+}
+function catList(p){
+  return '<div class="gvdBagCats">'+CATS.map(function(c){
+    return '<button data-cat="'+c[0]+'" class="'+(state.cat===c[0]?'on':'')+'">'+L3(c[1],c[2],c[3])+'</button>';
+  }).join('')+'</div>';
+}
+function grid(p){
+  var list;
+  if(state.cat==='cur'){
+    list=CUR;
+    return '<div class="gvdBagGrid">'+list.map(function(c,i){
+      return '<div class="gvdBagCell cur '+(state.sel==='cur'+i?'on':'')+'" data-cur="'+i+'"><div class="gvdBagIco">'+c.ico+'</div><div class="gvdBagName">'+L3(c.name[0],c.name[1],c.name[2])+'</div><b class="gvdBagCnt">'+c.get(p)+'</b></div>';
+    }).join('')+'</div>';
+  }
+  list=ITEMS.filter(function(it){return state.cat==='all'||it.cat===state.cat});
+  if(!list.length)return '<div class="gvdBagEmpty">'+L3('這一類還沒有東西','这一类还没有东西','Nothing here yet')+'</div>';
+  return '<div class="gvdBagGrid">'+list.map(function(it){
+    var n=cntOf(p,it);
+    var trial=(it.id==='trial7'&&p.skinTrial&&p.skinTrial.__until)?'<div class="gvdBagTag">'+L3('體驗中','体验中','Trial')+'</div>':'';
+    return '<div class="gvdBagCell '+(n<=0?'dim':'')+' '+(state.sel===it.id?'on':'')+'" data-item="'+it.id+'"><div class="gvdBagIco" style="background:linear-gradient(160deg,'+it.c1+'33,'+it.c1+'08);border-color:'+it.c1+'88">'+it.ico+'</div><div class="gvdBagName">'+L3(it.name[0],it.name[1],it.name[2])+'</div><b class="gvdBagCnt'+(n<=0?' zero':'')+'">'+(it.cat==='trial'&&it.id==='trial7'?'':n)+'</b>'+trial+'</div>';
+  }).join('')+'</div>';
+}
+function detail(p){
+  if(state.cat==='cur'&&state.sel&&state.sel.indexOf('cur')===0){
+    var i=+state.sel.slice(3),c=CUR[i];
+    return '<div class="gvdBagDetail"><div class="gvdBagBig">'+c.ico+'</div><h3>'+L3(c.name[0],c.name[1],c.name[2])+'</h3>'+
+      '<p class="gvdBagOwn">'+L3('擁有','拥有','Owned')+' <b>'+c.get(p)+'</b></p>'+
+      '<p class="gvdBagDesc">'+L3('可在相關商店或系統中使用。','可在相关商店或系统中使用。','Use it in the related shop or system.')+'</p>'+
+      '<button class="gvdBagUse" data-gocur="'+i+'">'+L3('去使用','去使用','Use it')+'</button></div>';
+  }
+  var it=ITEMS.filter(function(x){return x.id===state.sel})[0];
+  if(!it)return '<div class="gvdBagDetail empty">'+L3('點左邊的道具查看詳情','点左边的道具查看详情','Select an item to view details')+'</div>';
+  var n=cntOf(p,it);
+  return '<div class="gvdBagDetail"><div class="gvdBagBig" style="background:linear-gradient(160deg,'+it.c1+'44,'+it.c1+'11);border-color:'+it.c1+'99">'+it.ico+'</div>'+
+   '<h3>'+L3(it.name[0],it.name[1],it.name[2])+'</h3>'+
+   '<p class="gvdBagOwn">'+L3('擁有','拥有','Owned')+' <b>'+n+'</b></p>'+
+   '<p class="gvdBagDesc">'+L3(it.desc[0],it.desc[1],it.desc[2])+'</p>'+
+   '<button class="gvdBagUse" data-use="'+it.id+'"'+(n<=0?' disabled':'')+'>'+L3('使用','使用','Use')+'</button></div>';
+}
+function body(){
+  var p=ensureBag();if(!p)return '';
+  return '<div class="gvdBagWrap">'+curBar(p)+'<div class="gvdBagMain">'+catList(p)+'<div class="gvdBagMid">'+grid(p)+'</div>'+detail(p)+'</div></div>';
+}
+function refresh(){
+  var el=document.getElementById('gvdBagBody');if(!el)return;
+  var p=ensureBag();el.innerHTML=body();
+}
+function openPanel(pick){
+  var p=ensureBag();if(!p)return;
+  var h='<div id="gvdBagBody">'+body()+'</div>';
+  if(typeof panel==='function')panel(L3('背包','背包','Backpack'),h);
+  var el=document.getElementById('gvdBagBody');if(!el)return;
+  el.addEventListener('click',function(e){
+    var b=e.target.closest('button, .gvdBagCell');if(!b)return;
+    var p2=ensureBag();
+    if(b.dataset.cat){state.cat=b.dataset.cat;state.sel=null;refresh();return}
+    if(b.dataset.cur){state.cat='cur';state.sel='cur'+b.dataset.cur;refresh();return}
+    if(b.dataset.item){state.sel=b.dataset.item;refresh();return}
+    if(b.dataset.gocur){var c=CUR[+b.dataset.gocur];try{c.go()}catch(err){}return}
+    if(b.dataset.use){
+      var it=ITEMS.filter(function(x){return x.id===b.dataset.use})[0];if(!it)return;
+      if(!consume(p2,it))return;
+      try{it.use(p2,it)}catch(err){}
+      refresh();return
+    }
+  });
+  if(pick==='trial'){state.cat='trial';refresh();}
+  state.cat='all';
+}
+window.gvdOpenBag=function(){state.cat='all';state.sel=null;openPanel()};
+
+/* 體驗卡：選皮膚 → 7 天 */
+var TRIAL_LIST=[
+ {id:'doria_ultimate',n:['朵莉亞・深海帝后','朵莉亚・深海帝后','Doria · Deep Sea']},
+ {id:'ynsm',n:['李信・一念神魔','李信・一念神魔','Li Xin · Asura']},
+ {id:'li_xin_starlight',n:['李信・星穹裁決','李信・星穹裁决','Li Xin · Starlight']},
+ {id:'wukong_solar',n:['孫悟空・曜日戰魂','孙悟空・曜日战魂','Wukong · Solar']},
+ {id:'angela_aurora',n:['安琪拉・極光幻彩','安琪拉・极光幻彩','Angela · Aurora']},
+ {id:'doria_reef',n:['朵莉亞・珊瑚守望','朵莉亚・珊瑚守望','Doria · Coral']},
+ {id:'hacker',n:['安琪拉・追逃駭客','安琪拉・追逃骇客','Angela · Hacker']},
+ {id:'luban_field',n:['魯班・森林巡遊','鲁班·森林巡游','Luban · Forest']}
+];
+function openTrialPicker(){
+  var p=ensureBag();if(!p)return;
+  if(num(p.bag.trial7)<1){say2(L3('沒有暢玩卡了','没有畅玩卡了','No trial cards left'));return}
+  var own={};try{own=JSON.parse(localStorage.getItem('gvd_skins')||'{}')}catch(e){}
+  var h='<div class="gvdTrialList">'+TRIAL_LIST.map(function(t){
+    var got=!!own[t.id];
+    return '<div class="gvdTrialRow"><span>'+L3(t.n[0],t.n[1],t.n[2])+'</span>'+(got?'<button disabled>'+L3('已擁有','已拥有','Owned')+'</button>':'<button data-trialpick="'+t.id+'">'+L3('選它','选它','Pick')+'</button>')+'</div>';
+  }).join('')+'</div>';
+  if(typeof panel==='function')panel(L3('選一款暢玩皮膚（7 天）','选一款畅玩皮肤（7 天）','Pick a trial skin (7 days)'),h);
+  var pn=document.getElementById('extraPanel');if(!pn)return;
+  pn.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-trialpick]');if(!b)return;
+    window.gvdTrialPick(b.dataset.trialpick);try{document.getElementById('panelClose').click()}catch(err){}
+  });
+}
+
+window.gvdTrialPick=function(skinId){
+  var p=ensureBag();if(!p)return;
+  var own={};try{own=JSON.parse(localStorage.getItem('gvd_skins')||'{}')}catch(e){}
+  if(own[skinId]){say2(L3('這款已擁有，換一款吧','这款已拥有，换一款吧','You already own this one'));return}
+  if(num(p.bag.trial7)<1){say2(L3('沒有暢玩卡了','没有畅玩卡了','No trial cards left'));return}
+  p.bag.trial7=num(p.bag.trial7)-1;
+  if(!p.skinTrial||typeof p.skinTrial!=='object')p.skinTrial={};
+  own[skinId]=true;try{localStorage.setItem('gvd_skins',JSON.stringify(own))}catch(e){}
+  p.skinTrial[skinId]=Date.now()+7*86400000;p.skinOn=skinId;saveP();
+  say2(L3('已開通 7 天體驗：'+skinId,'已开通 7 天体验：'+skinId,'7-day trial unlocked: '+skinId));
+};
+function cleanupTrial(){
+  var p=ensureBag();if(!p||!p.skinTrial)return;
+  var own={};try{own=JSON.parse(localStorage.getItem('gvd_skins')||'{}')}catch(e){}
+  var changed=false,now=Date.now();
+  for(var k in p.skinTrial){
+    if(k==='__until')continue;
+    if(now>=num(p.skinTrial[k])){
+      if(own[k]&&!(p.permSkins&&p.permSkins[k])){delete own[k];changed=true}
+      delete p.skinTrial[k];
+    }
+  }
+  if(changed){try{localStorage.setItem('gvd_skins',JSON.stringify(own))}catch(e){}}
+  saveP();
+}
+
+/* 樣式 */
+try{
+ var st=document.createElement('style');
+ st.textContent=
+ '.gvdBagWrap{font-size:12px}'+
+ '.gvdBagBar{display:flex;gap:10px;flex-wrap:wrap;padding:8px 10px;border-radius:10px;background:linear-gradient(90deg,rgba(28,54,92,.95),rgba(20,38,66,.95));border:1px solid rgba(120,180,255,.28);margin-bottom:10px}'+
+ '.gvdBagCur{color:#dfeaff;font-size:12px}.gvdBagCur b{color:#ffd479}'+
+ '.gvdBagMain{display:flex;gap:8px;align-items:stretch;min-height:320px}'+
+ '.gvdBagCats{display:flex;flex-direction:column;gap:4px;min-width:88px}'+
+ '.gvdBagCats button{text-align:left;padding:7px 10px;border-radius:8px;border:1px solid rgba(150,200,255,.22)!important;background:linear-gradient(90deg,rgba(26,52,86,.9),rgba(16,32,54,.9))!important;color:#cfe2fb!important;font-size:12px}'+
+ '.gvdBagCats button.on{background:linear-gradient(90deg,rgba(63,159,255,.5),rgba(30,80,140,.6));border-color:rgba(140,200,255,.75);color:#fff}'+
+ '.gvdBagMid{flex:1;min-width:0;overflow:auto;max-height:44vh;padding:2px}'+
+ '.gvdBagGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px}'+
+ '.gvdBagCell{position:relative;border-radius:8px;border:1px solid rgba(140,190,255,.3);background:linear-gradient(160deg,rgba(32,60,100,.9),rgba(16,30,52,.95));padding:6px 4px 4px;text-align:center;cursor:pointer}'+
+ '.gvdBagCell.on{border-color:#ffd479;box-shadow:0 0 0 1px #ffd479 inset}'+
+ '.gvdBagCell.dim{opacity:.55}'+
+ '.gvdBagIco{height:44px;border-radius:6px;border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:4px}'+
+ '.gvdBagName{font-size:10px;color:#dbebff;line-height:1.25;min-height:24px;overflow:hidden}'+
+ '.gvdBagCnt{position:absolute;right:4px;bottom:2px;font-size:11px;color:#fff;text-shadow:0 1px 2px #000}'+
+ '.gvdBagCnt.zero{color:#ff9c9c}'+
+ '.gvdBagTag{position:absolute;left:0;top:0;background:#2b7fd6;color:#fff;font-size:9px;padding:1px 3px;border-radius:6px 0 6px 0}'+
+ '.gvdBagDetail{width:200px;flex:0 0 200px;border-radius:10px;border:1px solid rgba(140,190,255,.25);background:linear-gradient(180deg,rgba(24,46,78,.95),rgba(14,26,44,.95));padding:10px;text-align:center}'+
+ '.gvdBagBig{width:92px;height:92px;margin:4px auto 8px;border-radius:10px;border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:44px}'+
+ '.gvdBagDetail h3{margin:2px 0 4px;font-size:14px;color:#fff}'+
+ '.gvdBagOwn{font-size:11px;color:#a9c6e6;margin:0 0 6px}.gvdBagOwn b{color:#ffd479}'+
+ '.gvdBagDesc{font-size:11px;color:#b8cee6;text-align:left;line-height:1.5}'+
+ '.gvdBagUse{margin-top:8px;width:100%;padding:9px;border-radius:8px;border:1px solid #ffd479!important;background:linear-gradient(180deg,#ffcf6a,#e0a63a)!important;color:#3a2a08!important;font-weight:700}'+
+ '.gvdBagUse[disabled]{filter:grayscale(1);opacity:.6}'+
+ '.gvdBagEmpty{color:#dbeaff!important;padding:18px;font-size:12px;line-height:1.6}'+'.gvdBagDetail.empty{color:#dbeaff!important}'+'.gvdTrialRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 2px;border-bottom:1px solid rgba(255,255,255,.1);font-size:12px}.gvdTrialRow button{padding:6px 12px;border-radius:8px;border:1px solid #ffd479;background:#e0a63a;color:#3a2a08;font-weight:700}.gvdTrialRow button[disabled]{filter:grayscale(1);opacity:.6}';
+ document.head.appendChild(st);
+}catch(e){}
+
+function boot(){cleanupTrial();ensureBag();
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('#gvdNavBag');if(!b)return;
+    e.preventDefault();window.gvdOpenBag();
+  },true);
+}
+if(document.readyState!=='loading')setTimeout(boot,700);else document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,700)});
+window.addEventListener('load',function(){setTimeout(cleanupTrial,1500)});
 })();
 </script>
 </body>
