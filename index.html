@@ -7431,7 +7431,7 @@ function tryLock2(){
 var hintTimer=0;
 function hint(){
   if(hintTimer)return;hintTimer=1;
-  try{typeof say==='function'&&say(L3('若無法自動旋轉，請關閉手機「直向鎖定／自動旋轉鎖定」，或用 Safari／Chrome 開啟本頁。','若无法自动旋转，请关闭手机「竖向锁定／自动旋转锁定」，或用 Safari／Chrome 打开本页。','If it will not rotate, turn off screen rotation lock, or open this page in Safari / Chrome.'))}catch(e){}
+  try{typeof say==='function'&&say(L3('若無法自動旋轉，請關閉手機「直向鎖定／自動旋轉鎖定」，或用 Safari／Chrome 開啟本頁。','若无法自动旋转，请关闭手机「直向锁定／自动旋转锁定」，或用 Safari／Chrome 打开本页。','If it will not rotate, turn off screen rotation lock, or open this page in Safari / Chrome.'))}catch(e){}
   setTimeout(function(){hintTimer=0},5000);
 }
 function sync(){
@@ -7813,18 +7813,26 @@ function lay(h,r,team){
   h.x=h.h5x;h.y=h.h5y;
   return h;
 }
+function defBlue(){
+  var out=[pickRole];
+  ROLE_DEF.forEach(function(r){if(r.k!==pickRole)out.push(r.k)});
+  return out;
+}
+function defRed(){return ['duel','mid','adc','supp','jg']}
 function makeTeam(){
+  var rs=window.GVD_55_ROSTER||{};
+  var blueRoles=(rs.blue&&rs.blue.length===5)?rs.blue:defBlue();
+  var redRoles=(rs.red&&rs.red.length===5)?rs.red:defRed();
   var allies=[],foes=[];
-  ROLE_DEF.forEach(function(rd){
-    if(rd.k===pickRole)return;
-    var a=lay(mkHero(0,clsByRole(rd.k)),rd.k,0);
+  for(var i=1;i<5;i++){
+    var a=lay(mkHero(0,clsByRole(blueRoles[i])),blueRoles[i],0);
     a.atk=Math.round(a.atk*.92);a.max=a.hp=Math.round(a.max*1.25);
     allies.push(a);
-    var f=lay(mkHero(1,clsByRole(rd.k)),rd.k,1);
+    var f=lay(mkHero(1,clsByRole(redRoles[i])),redRoles[i],1);
     f.atk=Math.round(f.atk*.85);f.max=f.hp=Math.round(f.max*.95);
     foes.push(f);
-  });
-  return {allies:allies,foes:foes};
+  }
+  return {allies:allies,foes:foes,blueRoles:blueRoles,redRoles:redRoles};
 }
 
 var oldInit=init;
@@ -7834,7 +7842,9 @@ init=function(){
     if(!window.GVD_5V5)return;
     var rd=ROLE_DEF.filter(function(x){return x.k===pickRole;})[0]||ROLE_DEF[1];
     player.role5=pickRole;player.g5ly=rd.ly;player.h5x=330;player.h5y=rd.ly;player.y=rd.ly;
-    lay(enemyH,pickRole,1);enemyH.x=MW-330;enemyH.y=enemyH.g5ly;
+    var rs=window.GVD_55_ROSTER||{};
+    var redRoles=(rs.red&&rs.red.length===5)?rs.red:['duel','mid','adc','supp','jg'];
+    lay(enemyH,redRoles[0],1);enemyH.x=MW-330;enemyH.y=enemyH.g5ly;
     var t=makeTeam();
     HS=[player,enemyH].concat(t.allies).concat(t.foes);
     shiftJungle();
@@ -7880,7 +7890,8 @@ function bindRoleClicks(panelEl){
 }
 
 window.gvdStart55=start55;
-window.gvdRole55=function(k){pickRole=k;
+window.__gvdPickRole=pickRole;
+window.gvdRole55=function(k){pickRole=k;window.__gvdPickRole=k;
   try{Array.prototype.forEach.call(document.querySelectorAll('[data-gvdrole]'),function(x){var on=x.getAttribute('data-gvdrole')===k;x.style.borderColor=on?'#e0a63a':'rgba(40,60,90,.28)';x.style.background=on?'#ffe9bf':'#eef3fb'})}catch(e){}
   return pickRole};
 /* 入口：匹配面板與排位面板自動插入 5v5 區塊 */
@@ -7910,6 +7921,260 @@ function injectRank(){
 }
 function boot(){injectPanels();injectRank()}if(document.readyState!=='loading')setTimeout(boot,1200);else document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,1200)});
 })();
+</script>
+<script id="gvd-room">
+/* 1.4.7 增量：5v5 房間大廳（自建房／加入房間／十人位置） */
+(function(){
+'use strict';
+if(window.__gvdRoom)return;window.__gvdRoom=1;
+function L3(a,b,c){var l='zh-Hant';try{l=(typeof currentLanguage==='function'?currentLanguage():((JSON.parse(localStorage.getItem('gvd_profile')||'{}').lang)||'zh-Hant'))}catch(e){}return l==='en'?c:(l==='zh-Hans'?b:a)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var ROLES=[['duel','對抗路','对抗路','Solo'],['mid','中路','中路','Mid'],['adc','發育路','发育路','Gold'],['supp','輔助','辅助','Support'],['jg','打野','打野','Jungle']];
+function rName(k){var r=ROLES.filter(function(x){return x[0]===k})[0];return r?L3(r[1],r[2],r[3]):k}
+function storeKey(){return 'gvd_room_v1'}
+function load(){try{return JSON.parse(localStorage.getItem(storeKey())||'null')}catch(e){return null}}
+function save(r){try{localStorage.setItem(storeKey(),JSON.stringify(r))}catch(e){}}
+function myName(){try{var p=JSON.parse(localStorage.getItem('gvd_profile')||'{}');return p.name||L3('我','我','Me')}catch(e){return L3('我','我','Me')}}
+function newCode(){var c;do{c=String(Math.floor(1000+Math.random()*9000))}while(c==='0000');return c}
+function roleListBlue(){var me=window.__gvdPickRole||'mid';var out=[me];ROLES.forEach(function(r){if(r[0]!==me)out.push(r[0])});return out}
+function makeRoom(mode){
+  var roles=roleListBlue();
+  var blue=roles.map(function(r,i){return {role:r,name:i===0?myName():'',kind:i===0?'me':'empty'}});
+  var red=['duel','mid','adc','supp','jg'].map(function(r){return {role:r,name:'',kind:'empty'}});
+  var rm={code:newCode(),mode:mode||'match',blue:blue,red:red,at:Date.now()};
+  save(rm);return rm;
+}
+function filled(rm){return rm.blue.concat(rm.red).every(function(s){return s.kind!=='empty'})}
+function fillAI(rm){
+  rm.blue.forEach(function(s,i){if(s.kind==='empty'){s.kind='ai';s.name='AI '+(i+1)}});
+  rm.red.forEach(function(s,i){if(s.kind==='empty'){s.kind='ai';s.name='AI '+(i+6)}});
+  save(rm);
+}
+function slotRow(s,side,i){
+  var tag=s.kind==='me'?'<b style="color:#b8860b">'+L3('你','你','YOU')+'</b>':(s.kind==='friend'?'<b style="color:#2f7d32">'+L3('好友','好友','FRIEND')+'</b>':(s.kind==='ai'?'<b style="color:#5b6b7f">'+L3('人機','人机','BOT')+'</b>':(s.kind==='player'?'<b style="color:#2b6cb0">'+L3('真人','真人','PLAYER')+'</b>':'<i style="color:#98a2b3">'+L3('空位','空位','Empty')+'</i>')));
+  var btn='';
+  if(s.kind==='empty'){
+    btn='<button data-gvdroomai="'+side+'-'+i+'" style="padding:5px 10px;border-radius:8px">'+L3('AI 補位','AI 补位','Fill AI')+'</button>'+
+        '<button data-gvdroomfr="'+side+'-'+i+'" style="padding:5px 10px;border-radius:8px;margin-left:4px">'+L3('邀好友','邀好友','Invite')+'</button>';
+  }
+  return '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid rgba(40,60,90,.12)"><span style="width:86px;font-size:12px;opacity:.8">'+rName(s.role)+'</span><span style="flex:1;font-size:13px">'+(s.name?esc(s.name):'')+' '+tag+'</span>'+btn+'</div>';
+}
+function roomHTML(rm){
+  return '<h3>'+L3('5v5 房間','5v5 房间','5v5 Room')+' · '+rm.code+'</h3>'+
+   '<p style="font-size:12px;opacity:.75">'+L3('模式：','模式：','Mode: ')+(rm.mode==='rank'?L3('排位','排位','Ranked'):L3('匹配','匹配','Match'))+'　'+L3('房號分享給好友，十人到齊即可開局。','房号分享给好友，十人到齐即可开局。','Share the room code; start when all 10 seats are filled.')+'</p>'+
+   '<div style="display:flex;gap:14px;flex-wrap:wrap">'+
+   '<div style="flex:1;min-width:280px"><b style="font-size:13px;color:#1f4e79">'+L3('我方（藍）','我方（蓝）','Blue team')+'</b>'+rm.blue.map(function(s,i){return slotRow(s,0,i)}).join('')+'</div>'+
+   '<div style="flex:1;min-width:280px"><b style="font-size:13px;color:#8a2b2b">'+L3('敵方（紅）','敌方（红）','Red team')+'</b>'+rm.red.map(function(s,i){return slotRow(s,1,i)}).join('')+'</div></div>'+
+   '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+
+   '<button data-gvdroomfillall style="padding:9px 14px;border-radius:9px;border:1px solid #e0a63a;background:#ffe9bf;color:#1c2836;font-weight:700">'+L3('全部 AI 補位','全部 AI 补位','Fill all with AI')+'</button>'+
+   '<button data-gvdroomstart style="padding:9px 16px;border-radius:9px;border:1px solid '+(filled(rm)?'#2f7d32':'rgba(40,60,90,.25)')+';background:'+(filled(rm)?'#dcf5dc':'#f0f2f6')+';color:#1c2836;font-weight:700"'+(filled(rm)?'':' disabled')+'>'+L3('開始對局','开始对局','Start match')+'</button>'+
+   '<button data-gvdroomleave style="padding:9px 14px;border-radius:9px">'+L3('解散房間','解散房间','Close room')+'</button></div>'+
+   '<p style="font-size:10px;opacity:.55;margin-top:8px">'+L3('※ 目前是離線房：真人位置暫由人機代替，接上伺服器後同一房間可給真人加入。','※ 目前是离线房：真人位置暂由人机代替，接上服务器后同一房间可给真人加入。','※ Offline room: real-player seats are simulated by bots until the server is connected.')+'</p>';
+}
+function lobbyHTML(){
+  var rm=load();
+  return '<h3>'+L3('5v5 房間大廳','5v5 房间大厅','5v5 Room Lobby')+'</h3>'+
+   '<p style="font-size:11px;opacity:.75">'+L3('自己開房，或輸入 4 位房號加入別人的房間。','自己开房，或输入 4 位房号加入别人的房间。','Create your own room, or join with a 4-digit code.')+'</p>'+
+   '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">'+
+   '<button data-gvdroomnew="match" style="padding:10px 16px;border-radius:10px;border:1px solid #e0a63a;background:#ffe9bf;color:#1c2836;font-weight:700">'+L3('建立匹配房','建立匹配房','Create match room')+'</button>'+
+   '<button data-gvdroomnew="rank" style="padding:10px 16px;border-radius:10px;border:1px solid #7fd1ff;background:#e3f0ff;color:#1c2836;font-weight:700">'+L3('建立排位房','建立排位房','Create ranked room')+'</button></div>'+
+   '<div style="display:flex;gap:8px;align-items:center;margin:6px 0"><input id="gvdRoomCode" maxlength="4" placeholder="'+L3('4 位房號','4 位房号','4-digit code')+'" style="padding:9px 12px;border-radius:9px;border:1px solid rgba(40,60,90,.3);width:140px;font:600 13px system-ui"><button data-gvdroomjoin style="padding:9px 14px;border-radius:9px">'+L3('加入房間','加入房间','Join')+'</button></div>'+
+   (rm?'<div style="margin-top:8px;padding:10px;border-radius:10px;background:rgba(90,140,220,.10);border:1px solid rgba(90,140,220,.25)"><b>'+L3('你目前的房間：','你目前的房间：','Your room: ')+'</b>'+rm.code+' <button data-gvdroomreopen style="padding:5px 10px;border-radius:8px;margin-left:6px">'+L3('進入','进入','Enter')+'</button></div>':'');
+}
+function show(html){
+  if(typeof panel!=='function')return;
+  panel(L3('開房間','开房间','Rooms'),html);
+  bind();
+}
+function renderRoom(rm){show(roomHTML(rm))}
+function bind(){
+  var pn=document.getElementById('extraPanel');if(!pn||pn.__gvdRoomBind)return;pn.__gvdRoomBind=1;
+  pn.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-gvdroomnew],[data-gvdroomjoin],[data-gvdroomreopen],[data-gvdroomai],[data-gvdroomfr],[data-gvdroomfillall],[data-gvdroomstart],[data-gvdroomleave]');
+    if(!b)return;
+    if(b.hasAttribute('data-gvdroomnew')){renderRoom(makeRoom(b.dataset.gvdroomnew));return}
+    if(b.hasAttribute('data-gvdroomjoin')){
+      var code=(document.getElementById('gvdRoomCode').value||'').trim();
+      if(!/^\d{4}$/.test(code)){try{say(L3('房號是 4 位數字','房号是 4 位数字','Room code must be 4 digits'))}catch(e){};return}
+      var cur=load();
+      if(cur&&cur.code===code){renderRoom(cur);return}
+      var rm=makeRoom('match');rm.code=code;rm.blue.forEach(function(s,i){if(i>0&&s.kind==='empty'){s.kind='player';s.name=L3('玩家','玩家','Player')+' '+(i+1)}});
+      rm.red.forEach(function(s,i){if(s.kind==='empty'){s.kind='ai';s.name='AI '+(i+6)}});
+      save(rm);renderRoom(rm);return;
+    }
+    if(b.hasAttribute('data-gvdroomreopen')){var r0=load();if(r0)renderRoom(r0);return}
+    if(b.dataset.gvdroomai||b.dataset.gvdroomfr){
+      var r1=load();if(!r1)return;
+      var key=(b.dataset.gvdroomai||b.dataset.gvdroomfr).split('-');
+      var side=key[0]==='0'?r1.blue:r1.red,idx=Number(key[1]);
+      if(b.dataset.gvdroomai){side[idx].kind='ai';side[idx].name='AI '+(idx+1+(side===r1.red?5:0))}
+      else{
+        var fs=[];try{fs=JSON.parse(localStorage.getItem('gvd_profile')||'{}').friends||[]}catch(e){}
+        var f=fs[(idx+ (side===r1.red?1:0))%Math.max(1,fs.length)];
+        if(f){side[idx].kind='friend';side[idx].name=(f&&f.name)||String(f)}
+        else{side[idx].kind='player';side[idx].name=L3('玩家','玩家','Player')+' '+(idx+1+(side===r1.red?5:0))}
+      }
+      save(r1);renderRoom(r1);return;
+    }
+    if(b.hasAttribute('data-gvdroomfillall')){var r2=load();if(!r2)return;fillAI(r2);renderRoom(r2);return}
+    if(b.hasAttribute('data-gvdroomleave')){try{localStorage.removeItem(storeKey())}catch(e){}try{say(L3('房間已解散','房间已解散','Room closed'))}catch(e){};show(lobbyHTML());return}
+    if(b.hasAttribute('data-gvdroomstart')){
+      var r3=load();if(!r3||!filled(r3))return;
+      var me=window.__gvdPickRole||r3.blue[0].role;
+      try{if(typeof window.gvdRole55==='function')window.gvdRole55(me)}catch(e){}
+      window.GVD_55_ROSTER={blue:r3.blue.map(function(s){return s.role}),red:r3.red.map(function(s){return s.role})};
+      try{Array.prototype.forEach.call(document.querySelectorAll('button'),function(x){if(x.offsetParent!==null&&/^(關閉|关闭|Close)$/.test(x.textContent.trim()))x.click()})}catch(e){}
+      try{if(typeof window.gvdStart55==='function')window.gvdStart55()}catch(e){}
+      return;
+    }
+  });
+}
+function openRoom(){show(lobbyHTML())}
+window.gvdOpenRoom=openRoom;
+function addNav(){
+  try{
+    var mb=document.getElementById('matchBtn');
+    if(!mb||document.getElementById('gvdNavRoom'))return;
+    var b=document.createElement('button');b.id='gvdNavRoom';b.textContent=L3('開房間','开房间','Rooms');b.onclick=openRoom;
+    mb.parentNode.insertBefore(b,mb.nextSibling);
+  }catch(e){}
+}
+function boot(){addNav()}
+if(document.readyState!=='loading')setTimeout(boot,1500);else document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,1500)});
+})();
+</script>
+<script id="gvd-l10n">
+/* 1.4.7 增量：多語言（日本語／Русский／Deutsch／Español／Français） */
+(function(){
+'use strict';
+if(window.__gvdL10N)return;window.__gvdL10N=1;
+var D={"峽谷對決": ["Canyon Duel", "キャニオン・デュエル", "Каньон Дуэль", "Canyon Duell", "Duelo del Cañón", "Duel du Canyon"], "召喚師": ["Summoner", "サモナー", "Призыватель", "Beschwörer", "Invocador", "Invocateur"], "個人資料": ["Profile", "プロフィール", "Профиль", "Profil", "Perfil", "Profil"], "好友": ["Friends", "フレンド", "Друзья", "Freunde", "Amigos", "Amis"], "查找好友": ["Find friends", "フレンド検索", "Найти друзей", "Freunde suchen", "Buscar amigos", "Trouver des amis"], "背包": ["Bag", "バッグ", "Рюкзак", "Tasche", "Mochila", "Sac"], "主頁": ["Home", "ホーム", "Главная", "Startseite", "Inicio", "Accueil"], "活動": ["Events", "イベント", "События", "Events", "Eventos", "Événements"], "消息": ["Messages", "メッセージ", "Сообщения", "Nachrichten", "Mensajes", "Messages"], "段位排名": ["Ranking", "ランク", "Рейтинг", "Rangliste", "Clasificación", "Classement"], "匹配／房間": ["Match / Rooms", "マッチ／ルーム", "Матч / Комнаты", "Match / Räume", "Partida / Salas", "Match / Salons"], "開房間": ["Rooms", "ルーム", "Комнаты", "Räume", "Salas", "Salons"], "好友對決": ["Friend duel", "フレンド対戦", "Дуэль с другом", "Freundesduell", "Duelo amistoso", "Duel entre amis"], "郵箱": ["Mail", "メール", "Почта", "Post", "Correo", "Courrier"], "設置": ["Settings", "設定", "Настройки", "Einstellungen", "Ajustes", "Réglages"], "關閉": ["Close", "閉じる", "Закрыть", "Schließen", "Cerrar", "Fermer"], "確定": ["OK", "決定", "OK", "OK", "Aceptar", "OK"], "取消": ["Cancel", "キャンセル", "Отмена", "Abbrechen", "Cancelar", "Annuler"], "開始遊戲": ["Start game", "ゲーム開始", "Начать игру", "Spiel starten", "Iniciar partida", "Démarrer"], "選擇英雄": ["Select hero", "ヒーロー選択", "Выбор героя", "Held wählen", "Elegir héroe", "Choisir un héros"], "皮膚商店": ["Skin shop", "スキンショップ", "Магазин скинов", "Skin-Shop", "Tienda de aspectos", "Boutique de skins"], "單人": ["Solo", "ソロ", "Одиночная", "Solo", "Individual", "Solo"], "雙人分屏": ["Split screen", "2人分割", "Сплит-скрин", "Geteilter Bildschirm", "Pantalla dividida", "Écran partagé"], "線上對戰": ["Online", "オンライン", "Онлайн", "Online", "En línea", "En ligne"], "三路九塔": ["3 lanes · 9 towers", "3レーン・9タワー", "3 линии · 9 башен", "3 Lanes · 9 Türme", "3 carriles · 9 torres", "3 voies · 9 tours"], "多英雄選擇": ["Multi-hero", "多彩なヒーロー", "Много героев", "Mehrere Helden", "Varios héroes", "Plusieurs héros"], "本機雙人": ["Local 2P", "ローカル2P", "Локально 2 игрока", "Lokal 2 Spieler", "2 jugadores local", "2 joueurs local"], "進入戰場": ["Enter battle", "戦場へ", "В бой", "Zum Kampf", "Entrar en batalla", "Entrer en jeu"], "公告": ["Notice", "お知らせ", "Объявление", "Ankündigung", "Aviso", "Annonce"], "請將手機轉為橫屏遊玩": ["Please rotate your phone to landscape", "スマホを横向きにしてください", "Поверните телефон горизонтально", "Bitte drehen Sie das Handy ins Querformat", "Gire el móvil a horizontal", "Veuillez passer en mode paysage"], "商店": ["Shop", "ショップ", "Магазин", "Shop", "Tienda", "Boutique"], "擊殺": ["Kills", "キル", "Убийства", "Kills", "Bajas", "Éliminations"], "死亡": ["Deaths", "デス", "Смерти", "Tode", "Muertes", "Morts"], "助攻": ["Assists", "アシスト", "Помощь", "Assists", "Asistencias", "Aides"], "金幣": ["Gold", "ゴールド", "Золото", "Gold", "Oro", "Or"], "等級": ["Level", "レベル", "Уровень", "Level", "Nivel", "Niveau"], "回城": ["Recall", "リコール", "Возврат", "Zurück", "Volver", "Retour"], "恢復": ["Heal", "回復", "Лечение", "Heilung", "Curar", "Soin"], "閃現": ["Flash", "フラッシュ", "Вспышка", "Blitz", "Destello", "Saut"], "普攻": ["Attack", "通常攻撃", "Атака", "Angriff", "Ataque", "Attaque"], "暫停": ["Pause", "一時停止", "Пауза", "Pause", "Pausa", "Pause"], "退出": ["Exit", "退出", "Выйти", "Verlassen", "Salir", "Quitter"], "投降": ["Surrender", "投降", "Сдаться", "Aufgeben", "Rendirse", "Abandonner"], "拖曳方向": ["Drag to aim", "ドラッグで照準", "Тяните для прицела", "Ziehen zum Zielen", "Arrastra para apuntar", "Glisser pour viser"], "冷卻": ["CD", "クールダウン", "Перезарядка", "Abklingzeit", "Recarga", "Recharge"], "對抗路": ["Solo lane", "ソロレーン", "Соло-линия", "Solo-Lane", "Carril solo", "Voie solo"], "中路": ["Mid lane", "ミッド", "Мид", "Mid-Lane", "Carril central", "Voie du milieu"], "發育路": ["Gold lane", "ゴールドレーン", "Голд-линия", "Gold-Lane", "Carril de oro", "Voie dorée"], "輔助": ["Support", "サポート", "Поддержка", "Support", "Apoyo", "Support"], "打野": ["Jungle", "ジャングル", "Лесник", "Dschungel", "Jungla", "Jungle"], "法師": ["Mage", "メイジ", "Маг", "Magier", "Mago", "Mage"], "射手": ["Marksman", "射手", "Стрелок", "Schütze", "Tirador", "Tireur"], "戰士": ["Warrior", "戦士", "Воин", "Krieger", "Guerrero", "Guerrier"], "安琪拉": ["Angela", "アンジェラ", "Ангела", "Angela", "Angela", "Angela"], "孫悟空": ["Sun Wukong", "孫悟空", "Сунь Укун", "Sun Wukong", "Sun Wukong", "Sun Wukong"], "李信": ["Li Xin", "李信", "Ли Синь", "Li Xin", "Li Xin", "Li Xin"], "魯班": ["Luban", "魯班", "Лубань", "Luban", "Luban", "Luban"], "朵莉亞": ["Doria", "ドリア", "Дория", "Doria", "Doria", "Doria"], "火球": ["Fireball", "火球", "Фаербол", "Feuerball", "Bola de fuego", "Boule de feu"], "燃燒": ["Burn", "バーン", "Горение", "Brennen", "Quemar", "Brûlure"], "烈焰焚身": ["Flame body", "フレイムボディ", "Пламя", "Flammenmantel", "Cuerpo en llamas", "Corps enflammé"], "火球術": ["Bolt", "ボルト", "Снаряд", "Blitz", "Rayo", "Projectile"], "灼熱護盾": ["Blaze shield", "ブレイズシールド", "Щит пламени", "Glut-Schild", "Escudo ardiente", "Bouclier brûlant"], "瞬燃": ["Blink burn", "瞬燃", "Вспышка", "Brandblitz", "Destello ígneo", "Éclat de feu"], "分身突襲": ["Clone dash", "クローン突撃", "Клон-рывок", "Klon-Stoß", "Clon veloz", "Ruée du clone"], "橫掃": ["Sweep", "薙ぎ払い", "Размах", "Feger", "Barrido", "Balayage"], "七十二變": ["72 Transformations", "七十二変", "72 превращения", "72 Wandlungen", "72 transformaciones", "72 transformations"], "金箍棒": ["Staff smash", "金箍棒", "Посох", "Stabschlag", "Bastón", "Bâton"], "觔斗雲": ["Cloud leap", "觔斗雲", "Облако", "Wolkensprung", "Salto nube", "Nuage"], "毫毛分身": ["Hair clones", "毛の分身", "Клоны", "Haarklone", "Clones", "Clones"], "旋風斬": ["Whirlwind", "旋風斬", "Вихрь", "Wirbelwind", "Torbellino", "Tourbillon"], "突刺": ["Thrust", "突刺", "Выпад", "Stoß", "Estocada", "Estoc"], "斬魂": ["Soul slash", "斬魂", "Рассечение", "Seelenschnitt", "Corte de alma", "Tranche d'âme"], "劍氣": ["Sword aura", "剣気", "Аура меча", "Schwertaura", "Aura de espada", "Aura d'épée"], "戰意": ["Battle will", "戦意", "Боевой дух", "Kampfwille", "Voluntad", "Volonté"], "盾擊": ["Shield bash", "シールドバッシュ", "Удар щитом", "Schildstoß", "Golpe de escudo", "Coup de bouclier"], "炸彈": ["Bomb", "ボム", "Бомба", "Bombe", "Bomba", "Bombe"], "加農炮": ["Cannon", "キャノン", "Пушка", "Kanone", "Cañón", "Canon"], "護衛重炮": ["Guard cannon", "護衛重砲", "Тяжёлая пушка", "Schutzkanone", "Cañón pesado", "Canon lourd"], "瞄準砲": ["Aim shot", "照準砲", "Прицельный выстрел", "Zielschuss", "Disparo dirigido", "Tir visé"], "地雷": ["Mine", "地雷", "Мина", "Mine", "Mina", "Mine"], "閃步": ["Dash step", "閃歩", "Рывок", "Schrittblitz", "Paso veloz", "Pas vif"], "泡泡": ["Bubble", "バブル", "Пузырь", "Blase", "Burbuja", "Bulle"], "衝浪": ["Surf", "サーフ", "Сёрф", "Surfen", "Surfear", "Surf"], "大魚吃海": ["Big fish", "大魚が海を", "Большая рыба", "Großer Fisch", "Pez grande", "Gros poisson"], "水彈": ["Water shot", "水弾", "Водяной снаряд", "Wasserschuss", "Disparo de agua", "Tir d'eau"], "治癒之歌": ["Healing song", "癒しの歌", "Песнь исцеления", "Heillied", "Canción curativa", "Chant guérisseur"], "水流": ["Current", "水流", "Поток", "Strömung", "Corriente", "Courant"], "青銅": ["Bronze", "ブロンズ", "Бронза", "Bronze", "Bronce", "Bronze"], "白銀": ["Silver", "シルバー", "Серебро", "Silber", "Plata", "Argent"], "黃金": ["Gold", "ゴールド", "Золото", "Gold", "Oro", "Or"], "鉑金": ["Platinum", "プラチナ", "Платина", "Platin", "Platino", "Platine"], "鑽石": ["Diamond", "ダイヤ", "Алмаз", "Diamant", "Diamante", "Diamant"], "星耀": ["Star", "スター", "Звезда", "Stern", "Estrella", "Étoile"], "王者": ["King", "キング", "Король", "König", "Rey", "Roi"], "最強王者": ["Mythic King", "最強キング", "Мифический король", "Mythisch", "Rey mítico", "Roi mythique"], "建立匹配房": ["Create match room", "マッチルーム作成", "Создать комнату", "Match-Raum erstellen", "Crear sala", "Créer un salon"], "建立排位房": ["Create ranked room", "ランクルーム作成", "Рейтинговая комната", "Ranglisten-Raum", "Sala de clasificatoria", "Salon classé"], "加入房間": ["Join room", "ルームに参加", "Войти в комнату", "Raum beitreten", "Unirse a sala", "Rejoindre"], "我方（藍）": ["Blue team", "青チーム", "Синие", "Blaues Team", "Equipo azul", "Équipe bleue"], "敵方（紅）": ["Red team", "赤チーム", "Красные", "Rotes Team", "Equipo rojo", "Équipe rouge"], "空位": ["Empty", "空き", "Свободно", "Frei", "Libre", "Libre"], "AI 補位": ["Fill AI", "AI補充", "Заполнить ИИ", "KI füllen", "Rellenar IA", "Remplir IA"], "邀好友": ["Invite", "招待", "Пригласить", "Einladen", "Invitar", "Inviter"], "全部 AI 補位": ["Fill all AI", "全AI補充", "Все ИИ", "Alle KI", "Toda IA", "Tout IA"], "開始對局": ["Start match", "試合開始", "Начать матч", "Match starten", "Iniciar", "Lancer"], "解散房間": ["Close room", "ルーム解散", "Закрыть комнату", "Raum schließen", "Cerrar sala", "Fermer"], "搜尋": ["Search", "検索", "Поиск", "Suchen", "Buscar", "Chercher"], "添加": ["Add", "追加", "Добавить", "Hinzufügen", "Añadir", "Ajouter"], "商店 (B)": ["Shop (B)", "ショップ (B)", "Магазин (B)", "Shop (B)", "Tienda (B)", "Boutique (B)"], "商店 (/)": ["Shop (/)", "ショップ (/)", "Магазин (/)", "Shop (/)", "Tienda (/)", "Boutique (/)"], "Ⅱ 暫停": ["Ⅱ Pause", "Ⅱ 一時停止", "Ⅱ Пауза", "Ⅱ Pause", "Ⅱ Pausa", "Ⅱ Pause"], "⚙ 設置": ["⚙ Settings", "⚙ 設定", "⚙ Настройки", "⚙ Einstellungen", "⚙ Ajustes", "⚙ Réglages"], "10秒": ["10s", "10秒", "10с", "10 s", "10 s", "10 s"], "+200": ["+200", "+200", "+200", "+200", "+200", "+200"], "三路對戰：上、中、下三路每路各有三座防禦塔；摧毀敵方全部九座防禦塔後，才能攻擊水晶。草叢裡的人敵人看不到。": ["3 lanes, 3 towers each. Destroy all 9 enemy towers to hit the crystal. Enemies in bushes are hidden.", "3レーン各3タワー。敵の9タワーを破壊するとクリスタルを攻撃できます。草むらの敵は見えません。", "3 линии по 3 башни. Уничтожьте 9 башен врага, чтобы атаковать кристалл. Враги в кустах скрыты.", "3 Lanes mit je 3 Türmen. Zerstöre alle 9 Türme, um den Kristall anzugreifen. Feinde im Busch sind verborgen.", "3 carriles con 3 torres. Destruye las 9 torres enemigas para atacar el cristal. Los enemigos en arbustos no se ven.", "3 voies, 3 tours chacune. Détruisez les 9 tours ennemies pour attaquer le cristal. Les ennemis dans les buissons sont cachés."], "峽谷對決 · 第一賽季": ["Canyon Duel · Season 1", "キャニオン・デュエル · シーズン1", "Каньон Дуэль · Сезон 1", "Canyon Duell · Saison 1", "Duelo del Cañón · Temporada 1", "Duel du Canyon · Saison 1"], "官方帳號「小腦（峽谷官方）」已上線；好友支援跨裝置邀請；發現異常請回報官方號。": ["Official account “Xiao Nao (Canyon Official)” is live. Cross-device friend invites supported. Report issues to the official account.", "公式アカウント「小脳（峽谷公式）」が登場。フレンド招待は端末をまたげます。不具合は公式まで。", "Официальный аккаунт «Сяо Нао (официальный)» запущен. Приглашения друзей работают между устройствами.", "Offizieller Account „Xiao Nao (Canyon Official)“ ist live. Freundeseinladungen geräteübergreifend.", "La cuenta oficial “Xiao Nao (Canyon Official)” ya está activa. Invitaciones entre dispositivos.", "Le compte officiel « Xiao Nao (Canyon Official) » est en ligne. Invitations multi-appareils."], "匹配規則：優先真人；等待最多 60 秒，逾時自動轉為人機。": ["Matchmaking prefers real players; waits up to 60s, then falls back to bots.", "マッチングは実プレイヤー優先。最大60秒待機後、AIに切り替えます。", "Подбор сначала ищет людей, ждёт до 60 с, затем включает ботов.", "Matchmaking sucht echte Spieler, max. 60 s, danach Bots.", "Busca jugadores reales hasta 60 s, luego bots.", "Recherche des joueurs réels 60 s max, puis des bots."], "開始匹配（最多 60 秒）": ["Start matching (max 60s)", "マッチ開始（最大60秒）", "Начать подбор (до 60 с)", "Match starten (max. 60 s)", "Buscar partida (máx. 60 s)", "Lancer la recherche (60 s max)"], "取消匹配": ["Cancel matching", "マッチ取消", "Отменить подбор", "Match abbrechen", "Cancelar búsqueda", "Annuler"], "建立本機房間代碼": ["Create local room code", "ローカルルームコード作成", "Создать локальный код комнаты", "Lokalen Raumcode erstellen", "Crear código de sala local", "Créer un code de salon local"], "關閉 ✕": ["Close ✕", "閉じる ✕", "Закрыть ✕", "Schließen ✕", "Cerrar ✕", "Fermer ✕"], "玩法與操作說明（點開查看）": ["Controls & how to play (tap to open)", "操作説明（タップで表示）", "Управление и правила (нажмите)", "Steuerung & Spielweise (antippen)", "Controles y cómo jugar (toca)", "Commandes et règles (appuyer)"], "皮膚預覽以現有英雄 3D 模型套用專屬配色；正式對局外觀不會改動。": ["Skin preview uses the existing 3D model with custom colors; matches keep the normal look.", "スキン预览は既存3Dモデルに配色を適用。試合では通常外観のまま。", "Предпросмотр скина — та же 3D-модель с новой расцветкой; в бою外观 не меняется.", "Skin-Vorschau nutzt das 3D-Modell mit eigener Farbgebung; im Match bleibt das normale Aussehen.", "La vista previa aplica colores al modelo 3D; en partida se mantiene el aspecto normal.", "L’aperçu applique des couleurs au modèle 3D ; en partie, l’apparence reste normale."], "選擇皮膚外觀": ["Choose skin", "スキン選択", "Выбор скина", "Skin wählen", "Elegir aspecto", "Choisir un skin"], "拖曳模型可旋轉，雙指／滾輪可縮放。此處是遊戲內 3D 預覽，不會替換正式對局角色。": ["Drag to rotate, pinch or scroll to zoom. This is an in-game 3D preview; it does not replace match characters.", "ドラッグで回転、ピンチ／ホイールで拡大。ゲーム内3Dプレビューで、試合のキャラは変わりません。", "Тяните для вращения, масштабируйте. Это 3D-просмотр, персонажей в бою не заменяет.", "Ziehen zum Drehen, zoomen mit Pinch/Rollen. Nur Vorschau, kein Match-Charakter.", "Arrastra para girar, pellizca para zoom. Es una vista previa, no cambia el personaje.", "Glisser pour tourner, pincer pour zoomer. Aperçu seulement."], "P1 選角": ["P1 hero select", "P1 ヒーロー選択", "Выбор героя P1", "P1 Heldenwahl", "Elección P1", "Choix P1"], "敵方（電腦）選角": ["Enemy (CPU) hero", "敵（CPU）ヒーロー", "Герой врага (ИИ)", "Gegner (KI)", "Enemigo (CPU)", "Adversaire (IA)"], "段位": ["Rank", "ランク", "Ранг", "Rang", "Rango", "Rang"], "段位：": ["Rank: ", "ランク：", "Ранг: ", "Rang: ", "Rango: ", "Rang : "], "藍buff": ["Blue buff", "青バフ", "Синий бафф", "Blauer Buff", "Buff azul", "Buff bleu"], "紅buff": ["Red buff", "赤バフ", "Красный бафф", "Roter Buff", "Buff rojo", "Buff rouge"], "野豬（大）": ["Boar (big)", "イノシシ（大）", "Кабан (большой)", "Eber (groß)", "Jabalí (grande)", "Sanglier (grand)"], "野豬（小）": ["Boar (small)", "イノシシ（小）", "Кабан (малый)", "Eber (klein)", "Jabalí (pequeño)", "Sanglier (petit)"], "小鳥": ["Bird", "小鳥", "Птица", "Vogel", "Pájaro", "Oiseau"], "暴君": ["Tyrant", "タイラント", "Тиран", "Tyrant", "Tirano", "Tyran"], "主宰": ["Overlord", "オーバーロード", "Владыка", "Overlord", "Señor", "Suzerain"], "草叢": ["Bush", "草むら", "Куст", "Busch", "Arbusto", "Buisson"], "勝利": ["Victory", "勝利", "Победа", "Sieg", "Victoria", "Victoire"], "失敗": ["Defeat", "敗北", "Поражение", "Niederlage", "Derrota", "Défaite"], "投降／結束本局": ["Surrender / End match", "投降／試合終了", "Сдаться / Завершить", "Aufgeben / Beenden", "Rendirse / Terminar", "Abandonner / Terminer"]};
+var IDX={en:0,ja:1,ru:2,de:3,es:4,fr:5};
+try{
+  if(typeof GAME_LANGS==='object'&&GAME_LANGS){
+    GAME_LANGS.ja='日本語';GAME_LANGS.ru='Русский';GAME_LANGS.de='Deutsch';GAME_LANGS.es='Español';GAME_LANGS.fr='Français';
+  }
+}catch(e){}
+function lang(){try{return (typeof gameLang==='function'?gameLang():'zh-Hant')||'zh-Hant'}catch(e){return 'zh-Hant'}}
+function lookup(s,l){
+  if(s==null)return null;
+  var ix=IDX[l];if(ix===undefined)return null;
+  var k=String(s).trim();var v=D[k];if(!v)return null;
+  return v[ix]||null;
+}
+var REV={};
+for(var k0 in D){if(!D.hasOwnProperty(k0))continue;var e0=D[k0][0];if(e0)REV[e0.trim()]=k0}
+function applyNode(n){
+  if(n.nodeType!==3)return;
+  var l=lang();if(l==='zh-Hant'||l==='zh-Hans')return;
+  if(n.__gvdEn===undefined){
+    var cur=(n.nodeValue||'').trim();
+    if(REV[cur])n.__gvdEn=REV[cur];
+    else if(D[cur])n.__gvdEn=cur;
+  }
+  var src=n.__gvdEn;
+  var out=src?(D[src]?D[src][IDX[l]]:null):null;
+  if(!out){
+    if(n.__gvdPart===undefined)n.__gvdPart=n.nodeValue||'';
+    out=partial(n.__gvdPart,l);
+  }
+  if(out&&n.nodeValue!==out)n.nodeValue=out;
+}
+var ALIAS={'Summoner':'召喚師','Friendly Duel':'好友對決','Friend Duel':'好友對決','Mailbox':'郵箱','Mail':'郵箱','Friends':'好友','Shop':'商店','Bag':'背包','Home':'主頁','Events':'活動','Messages':'消息','Ranking':'段位排名','Profile':'個人資料','Match / Rooms':'匹配／房間','Rooms':'開房間','Settings':'設置','Close':'關閉','Exit':'退出','Pause':'暫停','Attack':'普攻','Recall':'回城','Heal':'恢復','Flash':'閃現','Level':'等級','Gold':'黃金','Silver':'白銀','Bronze':'青銅','Platinum':'鉑金','Diamond':'鑽石','Star':'星耀','King':'王者','Support':'輔助','Jungle':'打野','Mage':'法師','Marksman':'射手','Warrior':'戰士','Mid lane':'中路','Solo lane':'對抗路','Gold lane':'發育路','Surrender':'投降','Cancel':'取消','Search':'搜尋','Add':'添加','Empty':'空位','Invite':'邀好友','Join room':'加入房間','Start match':'開始對局','Sand':'空位'};
+function partial(str,l){
+  var out=str;
+  // 英文詞 → 對應中文詞 → 目標語言
+  for(var k in ALIAS){if(!ALIAS.hasOwnProperty(k))continue;
+    if(out.indexOf(k)>=0){var zh=ALIAS[k];var v=D[zh];if(v)out=out.split(k).join(v[IDX[l]]||k)}
+  }
+  // 殘留中文詞 → 目標語言
+  for(var k2 in D){if(!D.hasOwnProperty(k2))continue;
+    if(out!==k2&&out.indexOf(k2)>=0){var v2=D[k2];out=out.split(k2).join(v2[IDX[l]]||k2)}
+  }
+  return out;
+}
+function sweep(){
+  try{
+    if(lang()==='zh-Hant'||lang()==='zh-Hans')return;
+    var tw=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null);
+    var n;while(n=tw.nextNode())applyNode(n);
+  }catch(e){}
+}
+/* 讓既有翻譯管線直接輸出多語：有詞條就用我們的，沒有就退回它原本的英文 */
+try{
+  if(typeof trGame==='function'&&!trGame.__gvdL10N){
+    var orig=trGame;
+    var wrap=function(s){
+      var l=lang();
+      if(l!=='zh-Hant'&&l!=='zh-Hans'&&l!=='en'){
+        var hit=lookup(s,l);if(hit)return hit;
+      }
+      return orig.apply(this,arguments)
+    };
+    wrap.__gvdL10N=1;trGame=wrap;
+  }
+}catch(e){}
+/* Canvas 文字（英雄名、技能名、提示字） */
+function patchCanvas(){
+  try{
+    var P=CanvasRenderingContext2D.prototype;if(P.__gvdL10N)return;P.__gvdL10N=1;
+    var f=P.fillText,st=P.strokeText;
+    P.fillText=function(t,x,y){
+      var l=lang();if(typeof t==='string'){var o=lookup(t,l);if(o)t=o}
+      var a=[t,x,y];if(arguments.length>3)a.push(arguments[3]);return f.apply(this,a)
+    };
+    P.strokeText=function(t,x,y){
+      var l=lang();if(typeof t==='string'){var o=lookup(t,l);if(o)t=o}
+      var a=[t,x,y];if(arguments.length>3)a.push(arguments[3]);return st.apply(this,a)
+    };
+  }catch(e){}
+}
+function boot(){
+  patchCanvas();
+  sweep();
+  try{if(typeof translatePage==='function'&&(lang()!=='zh-Hant'&&lang()!=='zh-Hans'))translatePage()}catch(e){}
+  window.__gvdLastLang=lang();
+  setTimeout(sweep,1200);setTimeout(sweep,2600);setTimeout(sweep,4500);
+  try{
+    var tmr=null;
+    new MutationObserver(function(){
+      if(lang()==='zh-Hant'||lang()==='zh-Hans')return;
+      if(tmr)return;tmr=setTimeout(function(){tmr=null;sweep()},180);
+    }).observe(document.body,{childList:true,subtree:true});
+  }catch(e){}
+  setInterval(function(){
+    var l=lang();
+    if(l!==window.__gvdLastLang){window.__gvdLastLang=l;sweep();try{if(typeof translatePage==='function'&&l!=='zh-Hant'&&l!=='zh-Hans')translatePage()}catch(e){}}
+  },600);
+}
+if(document.readyState!=='loading')setTimeout(boot,300);else document.addEventListener('DOMContentLoaded',boot);
+window.GVD_L10N=D;window.gvdL10NSweep=sweep;window.gvdL10NLang=lang;window.gvdL10NApply=applyNode;window.gvdL10NRev=REV;
+})();
+
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
